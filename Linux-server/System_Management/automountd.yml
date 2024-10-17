@@ -1,10 +1,12 @@
 ---
+
   - name: Check AutoMountd
     command: pgrep automountd
     register: automountd_pid
     ignore_errors: yes
     changed_when: false
-
+    failed_when: automountd_pid.rc != 0 and automountd_pid.stdout_lines | length > 0
+    
   - name: Kill AutoMountd
     shell: kill -9 {{ item }}
     when: item is defined

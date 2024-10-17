@@ -11,6 +11,6 @@
       regexp: 'allow-transfer\s*{\s*.*?\bany;\s*}'
       line: 'allow-transfer{ }'
     when: named_state.stat.exists
-
+    ignore_errors: yes
 
 

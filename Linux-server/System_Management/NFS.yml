@@ -8,6 +8,8 @@
   register: nfsd_pid
   ignore_errors: yes
   changed_when: false
+  failed_when: nfsd_pid.rc != 0 and nfsd_pid.stdout_lines | length > 0
+
 
 - name: Kill NFS Deamon
   shell: kill -9 {{ item }}
@@ -26,6 +28,7 @@
   register: nis_processes
   ignore_errors: yes
   changed_when: false
+  failed_when: nis_processes.rc != 0 and nis_processes.stdout_lines | length > 0
 
 - name: Kill NIS Processes
   shell: kill -9 {{ item }}

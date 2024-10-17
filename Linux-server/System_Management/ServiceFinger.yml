@@ -19,6 +19,7 @@
     name: finger
     state: started
   register: service_status
+  failed_when: service_status is defined
   ignore_errors: yes
 
 - name: Return true If finger Service does not exist

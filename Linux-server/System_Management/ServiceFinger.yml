@@ -1,0 +1,44 @@
+---
+- name: include service names
+  include_vars:
+    file: ../vars/vulnerablity_rtype_services.yml
+
+- name: Get Result Finger Service is Exist
+  stat:
+    path: /etc/xinet.d
+  register: stat_status
+
+- name: Check Is Exist
+  debug:
+    msg: "inetd Folder doesn't Exist"
+  when: not stat_status.stat.exists
+
+
+- name: Check Finger Service Status
+  systemd:
+    name: finger
+    state: started
+  register: service_status
+  ignore_errors: yes
+
+- name: Return true If finger Service does not exist
+  fail:
+    msg: "Finger Service Exists"
+  when: service_status is succeeded
+
+- name: Return true If isExist rTypeFile
+  stat:
+    path: "/etc/xinet.d/{{ item }}"
+  register: rtype_stat_status
+  loop: "{{ check_services }}"
+
+- name: Modify Service File If rTypeFile is Exists
+  lineinfile:
+    path: "/etc/xinet.d/{{ item }}"
+    regexp: '^disable'
+    line: 'disable = yes'
+  when: item in rtype_stat_status and rtype_stat_status[item].stat.exists
+  loop: "{{ check_services }}"
+
+
+

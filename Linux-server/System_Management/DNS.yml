@@ -1,0 +1,16 @@
+---
+  - name: Return true If named.conf isExists
+    stat:
+      path: /etc/named.conf
+    register: named_state
+    ignore_errors: yes
+
+  - name: DNS Zone Transfer
+    lineinfile:
+      path: /etc/named.conf
+      regexp: 'allow-transfer\s*{\s*.*?\bany;\s*}'
+      line: 'allow-transfer{ }'
+    when: named_state.stat.exists
+
+
+

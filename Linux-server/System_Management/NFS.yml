@@ -1,0 +1,34 @@
+---
+
+# handler import
+#
+
+- name: Return True If NFS Service is Exists
+  command: pgrep nfsd
+  register: nfsd_pid
+  ignore_errors: yes
+  changed_when: false
+
+- name: Kill NFS Deamon
+  shell: kill -9 {{ item }}
+  when: item is define
+  loop: "{{ nfsd_pid.stdout_lines }}"
+  register: kill_result
+
+- name: Get Result Kill NFS Deamon
+  debug:
+    msg: "Kill Nfs deamons with Pid: {{ item }}"
+  loop: "{{ kill_result.results }}"
+  when: item is defined and item.rc == 0
+
+- name: Return True If NIS or NIS+ is Exists
+  shell: # ps -ef | egrep “ypserv|ypbind|ypxfrd|rpc.yppasswdd|rpc.ypupdated” | grep –v "grep“
+  register: nis_processes
+  ignore_errors: yes
+  changed_when: false
+
+- name: Kill NIS Processes
+  shell: kill -9 {{ item }}
+  when: item is define
+  loop: "{{ nis_processes.stdout_lines }}"
+  when: item is defined and item.rc == 0

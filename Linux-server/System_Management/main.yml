@@ -1,0 +1,21 @@
+---
+# tasks file for linux-server
+
+- name: debug print
+  debug:
+    msg: "test"
+
+- name: Inspect Finger Vulnerability
+  import_tasks: ServiceFinger.yml
+
+- name: Inspect FTP Service Vulnerability
+  import_tasks: FTP.yml
+
+- name: Inspect NFS Service Vulnerability
+  import_tasks: NFS.yml
+
+- name: Inspect AutoMountd Vulnerability
+  import_tasks: automountd.yml
+
+- name: Inspect DNS Vulnerability
+  import_tasks: DNS.yml

@@ -1,0 +1,33 @@
+---
+- name: Get list of running services
+  ansible.windows.win_shell: net start
+  register: running_services
+
+- name: Define unnecessary services
+  set_fact:
+    unnecessary_services:
+      - Alerter
+      - Clipbook
+      - Messenger
+      - "Simple TCP/IP Services"
+
+- name: Check if unnecessary services are running
+  debug:
+    msg: "{{ item }} is running"
+  loop: "{{ unnecessary_services }}"
+  when: item in running_services.stdout_lines
+
+- name: Stop unnecessary services if running
+  ansible.windows.win_service:
+    name: "{{ item }}"
+    start_mode: disabled
+    state: stopped
+  loop: "{{ unnecessary_services }}"
+  when: item in running_services.stdout_lines
+
+- name: Display message for services that are already disabled or stopped
+  debug:
+    msg: "{{ item }} is not running or already disabled"
+  loop: "{{ unnecessary_services }}"
+  when: item not in running_services.stdout_lines
+

@@ -1,0 +1,30 @@
+---
+  - name: Start tasks from Save_log.yml
+    import_tasks: /home/ubuntu/Master/windows/tasks/Patch_Log_Management/Save_Log.yml
+  
+  - name: Start tasks from Account_Management/Pwd_period_Check.yml
+    import_tasks: /home/ubuntu/Master/windows/tasks/Account_Management/Pwd_period_Check.yml
+   
+  - name: Start tasks from Account_Management/Account_Management/Id_Locked_Check.yml
+    import_tasks: /home/ubuntu/Master/windows/tasks/Account_Management/Id_Locked_Check.yml
+  
+  - name: Start tasks from Unused_Service_Check.yml
+    import_tasks: /home/ubuntu/Master/windows/tasks/Service_Management/Unused_Service_Check.yml
+  
+  - name: Start tasks from Anonymous_Ftp_Forbid.yml
+    import_tasks: /home/ubuntu/Master/windows/tasks/Service_Management/Anonymous_Ftp_Forbid.yml
+  
+  - name: Start tasks from Servicepack_Check.yml
+    import_tasks: /home/ubuntu/Master/windows/tasks/Patch_Log_Management/Servicepack_Check.yml
+
+  - name: Start tasks from Remote_Registry_Check.yml
+    import_tasks: /home/ubuntu/Master/windows/tasks/Patch_Log_Management/Remote_Registry_Check.yml
+
+  - name: Start tasks from Notlogin_Systemoff.yml
+    import_tasks: /home/ubuntu/Master/windows/tasks/Security_Management/Notlogin_Systemoff.yml
+
+  - name: Start tasks from Systemoff_by_Remote.yml
+    import_tasks: /home/ubuntu/Master/windows/tasks/Security_Management/Systemoff_by_Remote.yml
+
+  - name: Start tasks from Autologin_control.yml
+    import_tasks: /home/ubuntu/Master/windows/tasks/Security_Management/Autologin_control.yml

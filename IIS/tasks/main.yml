@@ -1,0 +1,9 @@
+---
+# tasks file for IIS
+
+  #- name: Task for new_IIS_log.yml
+  #  import_tasks: /home/ubuntu/Master/IIS/tasks/Security_Management/new_IIS_log.yml
+  
+  - name: Start for Cgi_Restrict.yml
+    import_tasks: /home/ubuntu/Master/IIS/tasks/Security_Management/Cgi_Restrict.yml
+

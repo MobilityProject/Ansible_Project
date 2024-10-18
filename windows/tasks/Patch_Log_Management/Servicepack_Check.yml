@@ -1,0 +1,16 @@
+---
+- name: Get Windows OS Version and Service Pack Info
+  win_shell: |
+    $os = Get-WmiObject -Class Win32_OperatingSystem
+    [PSCustomObject]@{
+      OsArchitecture          = $os.OSArchitecture
+      WindowsVersion          = $os.Caption
+      ServicePackMajorVersion = $os.ServicePackMajorVersion
+      ServicePackMinorVersion = $os.ServicePackMinorVersion
+    } | ConvertTo-Json -Compress
+  register: windows_info
+
+- name: Display Windows Version Info
+  debug:
+    var: windows_info.stdout
+### 현재 조치는 X, 윈도우 서버 버전 및 최신, 보조 서비스팩의 개수 

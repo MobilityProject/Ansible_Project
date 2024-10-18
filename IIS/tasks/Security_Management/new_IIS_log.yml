@@ -1,0 +1,13 @@
+---
+- name: Get list of log files in IIS log directory
+  win_shell: |
+    Get-ChildItem -Path 'C:\inetpub\logs\LogFiles\W3SVC1\*.log' | Select-Object -ExpandProperty FullName
+  register: log_files
+
+- name: Fetch each IIS log file
+  fetch:
+    src: "{{ item }}"  # 각 로그 파일의 경로
+    dest: '/home/ubuntu/Master/IIS/files/logs/'  # 로컬 저장 경로
+    flat: yes  # 하위 디렉토리 구조 무시
+  loop: "{{ log_files.stdout_lines }}"  # 로그 파일 목록을 반복
+

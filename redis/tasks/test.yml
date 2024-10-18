@@ -1,0 +1,62 @@
+---
+- name: Check redis.conf settings
+  hosts: all
+  become: yes
+  tasks:
+    # Redis 인증 패스워드 설정
+    - name: Check if 'requirepass' is commented out in redis.conf
+      command: grep -i '^\s*#\s*requirepass' /etc/redis/redis.conf
+      register: requirepass_commented
+      ignore_errors: yes
+      changed_when: false
+
+    - name: Fail if 'requirepass' is commented out
+      fail:
+        msg: "'requirepass' is commented out in /etc/redis/redis.conf"
+      when: 
+        - requirepass_commented.rc == 0
+        - requirepass_commented.stdout != ""
+      ignore_errors: yes
+
+    # Binding 설정
+    - name: Check if 'bind' setting has a valid IP address
+      shell: grep -E '^bind\s+[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+' /etc/redis/redis.conf
+      register: bind_ip_check
+      ignore_errors: yes
+      changed_when: false
+
+    - name: Fail if 'bind' setting does not have a valid IP address
+      fail:
+        msg: "'bind' setting does not have a valid IP address in /etc/redis/redis.conf"
+      when: bind_ip_check.rc != 0
+      ignore_errors: yes
+
+    # Slave 읽기 전용 모드 설정
+    - name: Check if 'replica-read-only' is set to 'yes'
+      command: grep -i '^\s*replica-read-only\s*yes' /etc/redis/redis.conf
+      register: replica_read_only_check
+      ignore_errors: yes
+      changed_when: false
+
+    - name: Fail if 'replica-read-only' is not set to 'yes'
+      fail:
+        msg: "'replica-read-only' is not set to 'yes' in /etc/redis/redis.conf"
+      when: replica_read_only_check.rc != 0
+
+    # rename-command 설정
+    - name: Check if 'rename-command' is commented out in redis.conf
+      command: grep -i '^\s*#\s*rename-command' /etc/redis/redis.conf
+      register: rename_command_check
+      ignore_errors: yes
+      changed_when: false
+
+    - name: Fail if 'rename-command' is commented out
+      fail:
+        msg: "'rename-command' is commented out in /etc/redis/redis.conf, which is a vulnerability."
+      when: rename_command_check.rc == 0
+
+    - name: Pass if 'rename-command' is not commented out
+      debug:
+        msg: "'rename-command' is not commented out in /etc/redis/redis.conf. This is secure."
+      when: rename_command_check.rc != 0
+

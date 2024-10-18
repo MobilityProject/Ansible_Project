@@ -1,0 +1,51 @@
+---
+- name: Check /etc/redis permissions
+  hosts: all
+  become: yes
+  tasks:
+
+  # 데이터 디렉터리 접근 권한 설정 
+    - name: /etc/redis 권한 확인
+      command: ls -ld /etc/redis
+      register: redis_permissions
+
+    - name: 권한이 750인지 확인하고 결과 처리
+      debug:
+        msg: >
+          {% if redis_permissions.stdout.startswith('drwxr-x---') %}
+          /etc/redis의 권한이 750입니다. 설정이 올바릅니다. (ok)
+          {% else %}
+          /etc/redis의 권한이 750을 초과합니다. 검토가 필요합니다.
+          {% endif %}
+
+    - name: 권한이 750이 아닐 경우 실패 처리
+      fail:
+        msg: "/etc/redis의 권한이 750이 아닙니다. 검토가 필요합니다."
+      when: not redis_permissions.stdout.startswith('drwxr-x---')
+
+    - name: 권한을 750으로 변경
+      file:
+        path: /etc/redis
+        mode: '0750'
+        state: directory
+      when: not redis_permissions.stdout.startswith('drwxr-x---')
+
+  # 설정 파일 접근권한 설정
+    - name: /etc/redis/redis.conf 권한 확인
+      command: ls -al /etc/redis/redis.conf
+      register: redis_conf_permissions
+
+    - name: 권한 처리
+      debug:
+        msg: >
+          {% if redis_conf_permissions.stdout.split()[0] == '-rw-------' %}
+          /etc/redis/redis.conf의 권한이 600입니다. 설정이 올바릅니다. (success)
+          {% else %}
+          /etc/redis/redis.conf의 권한이 600을 초과합니다. 권한을 600으로 변경합니다.
+          {% endif %}
+
+    - name: 권한을 600으로 변경
+      file:
+        path: /etc/redis/redis.conf
+        mode: '0600'
+      when: redis_conf_permissions.stdout.split()[0] != '-rw-------'

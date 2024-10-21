@@ -1,0 +1,16 @@
+---
+  - name: root 권한 실행 점검
+    shell: cat /etc/my.cnf.d/mysql-server.cnf | grep user
+    register: result
+    ignore_errors: yes
+
+  - name: 실행 user 정보 확인
+    set_fact:
+      current_user_info: "{{ item }}"
+    loop: "{{ result.stdout_lines }}"
+    when: "'#' not in item"
+
+  - name: 현재 실행 user 정보
+    debug:
+      msg: "{{'현재 실행 user 정보가 적합합니다.' if 'root' not in current_user_info else '현재 실행 user 정보가 부적합합니다.'}}"
+

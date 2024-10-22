@@ -13,7 +13,7 @@
     register: tmp
   - name: tmp
     debug:
-      msg: {{tmp}}
+      msg: "{{tmp}}"
     
   - name: ssh key gen
     shell: ssh-keygen -t rsa -f ~/../../home/semaphore/.ssh/id_rsa -N '' -y 

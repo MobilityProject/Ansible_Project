@@ -2,20 +2,11 @@
 - name: ssh key gen & deply
   hosts: localhost
   connection: local
-  become: false
+  become: yes
   tasks:
   - name: include service names
     include_vars:
       file: ./Linux-server/vars/ssh_key_deploy.yml
-
-  - name: who
-    shell: whoami
-    register: who
-
-  - name: who who
-    debug:
-      msg: "{{who}}"
-
     
   - name: ssh key gen
     shell: ssh-keygen -t rsa -f /home/semaphore/.ssh/id_rsa -N '' -y 

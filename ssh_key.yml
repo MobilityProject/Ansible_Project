@@ -22,14 +22,15 @@
     ignore_errors: yes
 
   - name: ssh key deploy
-    expect:
-      command: sudo ssh-copy-id -i /home/semaphore/.ssh/id_rsa.pub {{ item }}
-      responses:
-        "{{item}}'s password:" : "{{password}}"
-      timeout: 30
+    sehll: sudo ssh-copy-id -i /home/semaphore/.ssh/id_rsa.pub {{ item }}
     register: result
     loop: "{{user}}"
     ignore_errors: yes
+
+  - name: password
+    debug:
+      msg: >
+          {{result}}
 
   - name: ssh key check
     debug:

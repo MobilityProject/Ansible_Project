@@ -16,7 +16,8 @@
         'Enter file in which to save the key': '\r'
         'Enter passphrase for key': '\r'
         'Enter same passphrase again': '\r'
-      
+      args:
+        creates: /home/semaphore/.ssh/id_rsa
     ignore_errors: yes
 
   - name: ssh key check

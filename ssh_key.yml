@@ -10,7 +10,7 @@
 
     
   - name: Generate SSH key
-    shell: ssh-keygen -t rsa -b 4096 -f /home/semaphore/.ssh/id_rsa -N ""
+    shell: ssh-keygen -t rsa -b 4096 -f /home/semaphore/.ssh/id_rsa -N "" -y
     register: ssh_keygen_result
     ignore_errors: yes
 

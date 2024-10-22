@@ -12,7 +12,7 @@
   - name: ssh key gen
     expect:
       command: ssh-keygen -t rsa -b 4096 -f /home/semaphore/.ssh/id_rsa -N '' -y 
-      responese:
+      responses:
         'Enter': '\r\r'
       
     ignore_errors: yes

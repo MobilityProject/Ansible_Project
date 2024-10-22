@@ -23,8 +23,8 @@
 
   - name: ssh key deploy
     sehll: sudo ssh-copy-id -i /home/semaphore/.ssh/id_rsa.pub {{ item }}
-    register: result
     loop: "{{user}}"
+    register: result
     ignore_errors: yes
 
   - name: password

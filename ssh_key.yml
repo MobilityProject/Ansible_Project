@@ -20,7 +20,10 @@
     ignore_errors: yes
 
   - name: ssh key deploy
-    command: ssh-copy-id -i /home/semaphore/.ssh/id_rsa.pub {{ item }}
+    expect:
+      command: ssh-copy-id -i /home/semaphore/.ssh/id_rsa.pub {{ item }}
+      responses:
+      'Password': "dkagh1."
     register: result
     loop: "{{user}}"
     ignore_errors: yes

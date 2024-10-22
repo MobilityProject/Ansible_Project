@@ -10,9 +10,13 @@
     include_vars:
       file: ./Linux-server/vars/ssh_key_deploy.yml
 
+  - name: Check if SSH key already exists
+    stat:
+      path: /home/semaphore/.ssh/id_rsa
+    register: ssh_key
     
   - name: Generate SSH key
-    shell: ssh-keygen -t rsa -b 4096 -f /home/semaphore/.ssh/id_rsa -N "" -y
+    command: > ssh-keygen -t rsa -b 4096 -f /home/semaphore/.ssh/id_rsa -N "{{ '' }}" {{ '-y' if ssh_key.stat.exists else '' }}
     register: ssh_keygen_result
     ignore_errors: yes
 

@@ -9,7 +9,7 @@
       file: ./Linux-server/vars/ssh_key_deploy.yml
       
   - name: test
-    shell: cd /tmp | pwd
+    shell: ls -al /tmp
     register: tmp
   - name: tmp
     debug:

@@ -3,6 +3,8 @@
   hosts: localhost
   connection: local
   become: yes
+  vars:
+    - password: "dkagh1."
   tasks:
   - name: include service names
     include_vars:
@@ -23,7 +25,7 @@
     expect:
       command: sudo ssh-copy-id -i /home/semaphore/.ssh/id_rsa.pub {{ item }}
       responses:
-      'password: ' : "dkagh1."
+      'password: ' : "{{password}}"
     register: result
     loop: "{{user}}"
     ignore_errors: yes

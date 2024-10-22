@@ -1,11 +1,12 @@
 ---
-- name: ssh key gen
+- name: ssh key gen & deply
   hosts: localhost
   connection: local
-  become: yes
-  vars:
-    - user: devops@10.0.2.15
   tasks:
+  - name: include service names
+    include_vars:
+      file: ./Linux-server/vars/ssh_key_deploy.yml
+
   - name: ssh key gen
     shell: ssh-keygen -t rsa -f ~/.ssh/id_rsa -N '' -y 
     ignore_errors: yes

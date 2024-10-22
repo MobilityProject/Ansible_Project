@@ -1,0 +1,12 @@
+    # 로그 활성화 
+    - name: Get Redis Slowing Configuration
+      command: redis-cli config get slowing-log-slower-than
+      register: slowlog_config
+
+    - name: Extract the Number Value
+      set_fact:
+        slowlog_value: "{{ slowlog_config.stdout | regex_search('\\d+') }}"
+
+    - name: Check if The slowlog value is negative
+      command: redis-cli config set slowing-log-slower-than 100
+      when: slowlog_value | int < 0

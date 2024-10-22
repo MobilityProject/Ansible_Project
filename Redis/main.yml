@@ -1,0 +1,12 @@
+---
+# tasks file for linux-server
+
+- name: debug print
+  debug:
+    msg: "test"
+
+- name: Security settings and permissions management
+  import_tasks: Redis_account_security.yml
+
+- name: Enabling Logs
+  import_tasks: Redis_Log

@@ -1,7 +1,7 @@
 ---
+- name: 모든 호스트에 대해 Ping 확인
+  hosts: all
+  tasks:
 
-# handler import
-#
-
-- name: Return True If NFS Service is Exists
-  ping:
+  - name: Return True If NFS Service is Exists
+    ping:

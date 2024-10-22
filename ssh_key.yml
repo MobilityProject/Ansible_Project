@@ -2,7 +2,7 @@
 - name: ssh key gen & deply
   hosts: localhost
   connection: local
-  become: yes
+  become: false
   vars:
     - password: "dkagh1."
   tasks:

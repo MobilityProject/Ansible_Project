@@ -12,8 +12,6 @@
 
     
   - name: Generate SSH key
-    become: yes
-    become_user: "semaphore"
     shell: ssh-keygen -t rsa -b 4096 -f /home/semaphore/.ssh/id_rsa -N "" -y
     register: ssh_keygen_result
     ignore_errors: yes

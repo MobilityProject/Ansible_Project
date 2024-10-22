@@ -17,7 +17,7 @@
     ignore_errors: yes
 
   - name: ssh key deploy
-    shell: sudo ssh-copy-id -i ~/.ssh/id_rsa.pub {{ item }}
+    shell: ssh-copy-id -i ~/.ssh/id_rsa.pub {{ item }}
     register: result
     loop: "{{user}}"
     ignore_errors: yes

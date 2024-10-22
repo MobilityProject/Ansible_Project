@@ -7,18 +7,30 @@
   - name: include service names
     include_vars:
       file: ./Linux-server/vars/ssh_key_deploy.yml
+      
+  - name: cd
+    shell: cd ~/../../home/semaphore/.ssh
 
+  - name: pwd
+    shell: pwd
+    register: pwd
+
+  - name: pwd
+    debug:
+      msg: "{{pwd}}"
+    
+    
   - name: ssh key gen
-    shell: ssh-keygen -t rsa -f ~/../../home/semaphore/.ssh/id_rsa -N '' -y 
+    shell: ssh-keygen -t rsa -f ./id_rsa -N '' -y 
     ignore_errors: yes
 
   - name: ssh key check
-    shell: cat ~/../../home/semaphore/.ssh/id_rsa
+    shell: cat ./.ssh/id_rsa
     register: private_key
     ignore_errors: yes
 
   - name: ssh key deploy
-    shell: ssh-copy-id -i ~/../../home/semaphore/.ssh/id_rsa.pub {{ item }}
+    shell: ssh-copy-id -i ./.ssh/id_rsa.pub {{ item }}
     register: result
     loop: "{{user}}"
     ignore_errors: yes

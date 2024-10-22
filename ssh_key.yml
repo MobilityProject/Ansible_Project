@@ -2,6 +2,7 @@
 - name: ssh key gen & deply
   hosts: localhost
   connection: local
+  become: yes
   tasks:
   - name: include service names
     include_vars:

@@ -1,21 +1,30 @@
 ---
+  #world writable file 비동기로 서치를 수행
   - name: Search World Writable File
     command: find / -xdev -type f -perm -2 
     register: world_writable_list
-    async: 10 
+    async: 10 # 10초 이상 지날 경우 수행하지 않음 
     poll: 0   
     ignore_errors: yes
     changed_when: false
- 
+
+  # Path 환경 변수 획득
   - name: File Authority Check
     command: echo $PATH
     register: path_variable
     changed_when: false
 
+  # Path 환경 변수 내부에 .이 있을 경우를 확인
   - name: Check for Dot in Path Variable
     set_fact:
-      has_dot: "{{ path_variable.stdout is search('\\.') }} | bool"
-
+      has_dot: "{{ path_variable.stdout is search('\\.') }}"
+  
+  - name: Dot Include in Path Environment Variable
+    fail:
+      msg: "Dot detected in path environment variable"
+    when: has_dot
+    ignore_errors: yes
+      
   - name: Get File State
     stat:
       path: "{{ item }}"

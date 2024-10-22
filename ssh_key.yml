@@ -7,10 +7,14 @@
   - name: include service names
     include_vars:
       file: ./Linux-server/vars/ssh_key_deploy.yml
- # -f /home/semaphore/.ssh/id_rsa -N '' -y 
+
     
   - name: ssh key gen
-    shell: ssh-keygen -t rsa
+    expect:
+      command: ssh-keygen -t rsa -b 4096 -f /home/semaphore/.ssh/id_rsa -N '' -y 
+      responese:
+        'Enter': '\n'
+      
     ignore_errors: yes
 
   - name: ssh key check

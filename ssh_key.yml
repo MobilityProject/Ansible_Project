@@ -3,7 +3,6 @@
   hosts: localhost
   connection: local
   become: yes
-  become_user: semaphore
   vars:
     - password: "dkagh1."
   tasks:
@@ -13,6 +12,7 @@
 
     
   - name: Generate SSH key
+    become_user: semaphore
     shell: ssh-keygen -t rsa -b 4096 -f /home/semaphore/.ssh/id_rsa -N "" -y
     register: ssh_keygen_result
     ignore_errors: yes

@@ -21,7 +21,7 @@
 
   - name: ssh key deploy
     expect:
-      command: ssh-copy-id -i /home/semaphore/.ssh/id_rsa.pub {{ item }}
+      command: sudo ssh-copy-id -i /home/semaphore/.ssh/id_rsa.pub {{ item }}
       responses:
       '(?i)password': "dkagh1."
     register: result

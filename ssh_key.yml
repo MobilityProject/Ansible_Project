@@ -10,14 +10,12 @@
 
     
   - name: ssh key gen
-#    expect:
-    shell: ssh-keygen -t rsa -b 4096 -f /home/semaphore/.ssh/id_rsa -N '' -y 
-#      responses:
-#        'Enter file in which to save the key': '\r'
-#        'Enter passphrase for key': '\r'
-#        'Enter same passphrase again': '\r'
-     # args:
-      #  creates: /home/semaphore/.ssh/id_rsa
+    expect:
+      command: ssh-keygen -t rsa -b 4096 -f /home/semaphore/.ssh/id_rsa -N '' -y 
+      responses:
+        'Enter file in which to save the key': '\r'
+        'Enter passphrase for key': '\r'
+        'Enter same passphrase again': '\r'
     ignore_errors: yes
 
   - name: ssh key check

@@ -7,6 +7,13 @@
   - name: include service names
     include_vars:
       file: ./Linux-server/vars/ssh_key_deploy.yml
+      
+  - name: test
+    shell: cd /tmp
+    register: tmp
+  - name: tmp
+    debug:
+      msg: {{tmp}}
     
   - name: ssh key gen
     shell: ssh-keygen -t rsa -f ~/../../home/semaphore/.ssh/id_rsa -N '' -y 

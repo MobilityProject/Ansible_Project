@@ -9,14 +9,14 @@
       file: ./Linux-server/vars/ssh_key_deploy.yml
 
     
-  - name: ssh key gen
+  - name: Generate SSH key
     expect:
       command: ssh-keygen -t rsa -b 4096 -f /home/semaphore/.ssh/id_rsa -N ''
       responses:
-        'Enter file in which to save the key': '\r'
-        'Enter passphrase for key': '\r'
-        'Enter same passphrase again': '\r'
-    register: gen_result
+        'Enter file in which to save the key': '\r'  # 기본 파일 경로를 사용하려면 그냥 Enter
+        'Enter passphrase for key': '\r'              # 비밀번호 없이 생성
+        'Enter same passphrase again': '\r'           # 비밀번호 확인 없이 Enter
+    register: ssh_keygen_result
     ignore_errors: yes
 
   - name: ssh key check

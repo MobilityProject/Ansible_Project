@@ -25,7 +25,7 @@
     expect:
       command: sudo ssh-copy-id -i /home/semaphore/.ssh/id_rsa.pub {{ item }}
       responses:
-        "{{itme}}\'s password:" : "{{password}}"
+        '{{item}}\'s password:' : "{{password}}"
     register: result
     loop: "{{user}}"
     ignore_errors: yes

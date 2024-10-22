@@ -16,6 +16,7 @@
         'Enter file in which to save the key': '\r'
         'Enter passphrase for key': '\r'
         'Enter same passphrase again': '\r'
+    register: gen_result
     ignore_errors: yes
 
   - name: ssh key check

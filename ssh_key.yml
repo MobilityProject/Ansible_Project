@@ -13,7 +13,7 @@
     expect:
       command: ssh-keygen -t rsa -b 4096 -f /home/semaphore/.ssh/id_rsa -N '' -y 
       responese:
-        'Enter': '\r'
+        'Enter': '\r\r'
       
     ignore_errors: yes
 

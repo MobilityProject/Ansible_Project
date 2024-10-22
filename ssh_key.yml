@@ -2,7 +2,8 @@
 - name: ssh key gen & deply
   hosts: localhost
   connection: local
-  become: false
+  become: yes
+  become_user: semaphore
   vars:
     - password: "dkagh1."
   tasks:

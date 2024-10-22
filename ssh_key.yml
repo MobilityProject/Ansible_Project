@@ -1,0 +1,30 @@
+---
+- name: ssh key gen
+  hosts: localhost
+  connection: local
+  become: yes
+  vars:
+    - user: devops@10.0.2.15
+  tasks:
+  - name: ssh key gen
+    shell: ssh-keygen -t rsa -f ~/.ssh/id_rsa -N '' -y 
+    ignore_errors: yes
+
+  - name: ssh key check
+    shell: cat ~/.ssh/id_rsa
+    register: private_key
+    ignore_errors: yes
+
+  - name: ssh key deploy
+    shell: sudo ssh-copy-id -i ~/.ssh/id_rsa.pub {{ user }}
+    register: result
+#    loop: "{{user}}"
+    ignore_errors: yes
+
+  - name: ssh key check
+    debug:
+      msg: >
+          private_key: {{ private_key}}
+          {{result}}
+          "complete"
+  

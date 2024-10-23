@@ -1,0 +1,34 @@
+---
+# 1. applicationHost.config 파일에서 enableParentPaths 값을 확인
+- name: Search for enableParentPaths value in applicationHost.config using PowerShell
+  win_shell: |
+    [xml]$config = Get-Content -Path 'C:\windows\System32\inetsrv\config\applicationHost.config'
+    $site = $config.configuration.location.'system.webServer'.asp | Where-Object { $_.enableParentPaths -ne $null }
+    $currentValue = $site.enableParentPaths
+    Write-Output "Current enableParentPaths value is: $currentValue"
+  register: enable_parent_paths_value
+
+- name: Output current enableParentPaths value
+  debug:
+    msg: "{{ enable_parent_paths_value.stdout }}"
+
+# 2. enableParentPaths 값이 false가 아니라면, 값을 false로 변경
+- name: Set enableParentPaths to false if not already set using PowerShell
+  win_shell: |
+    [xml]$config = Get-Content -Path 'C:\windows\System32\inetsrv\config\applicationHost.config'
+    $site = $config.configuration.location.'system.webServer'.asp | Where-Object { $_.enableParentPaths -ne $null }
+    $currentValue = $site.enableParentPaths
+    if ($currentValue -ne "false") {
+        #Write-Output "Current enableParentPaths value: $currentValue"
+        $site.enableParentPaths = "false"
+        $config.Save('C:\windows\System32\inetsrv\config\applicationHost.config')
+        Write-Output "enableParentPaths value has been changed to false"
+    } else {
+        Write-Output "enableParentPaths value is already false"
+    }
+  register: change_enable_parent_paths_result
+
+- name: Output result of enableParentPaths value modification
+  debug:
+    msg: "{{ change_enable_parent_paths_result.stdout }}"
+

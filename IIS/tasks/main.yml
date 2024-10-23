@@ -7,3 +7,14 @@
   - name: Start for Cgi_Restrict.yml
     import_tasks: /home/ubuntu/Master/IIS/tasks/Security_Management/Cgi_Restrict.yml
 
+  - name: Start for Webdav_off.yml
+    import_tasks: /home/ubuntu/Master/IIS/tasks/Security_Management/Webdav_off.yml
+  
+  - name: Start for High_Directory_Access.yml
+    import_tasks: /home/ubuntu/Master/IIS/tasks/Access_Management/High_Directory_Access.yml
+
+  - name: Start for Link_Deny.yml
+    import_tasks: /home/ubuntu/Master/IIS/tasks/Security_Management/Link_Deny.yml
+  
+  - name: Start for Unused_File_Delete.yml
+    import_tasks: /home/ubuntu/Master/IIS/tasks/Security_Management/Unused_File_Delete.yml

@@ -1,0 +1,27 @@
+---
+- name: Find shortcut (.lnk) files in wwwroot directory
+  win_shell: |
+    $LinkFiles = Get-ChildItem -Path "$env:SystemDrive\inetpub\wwwroot" -Recurse -Filter *.lnk
+    if ($LinkFiles) {
+        $LinkFiles.FullName
+    } else {
+        Write-Output "No shortcut files found."
+    }
+  changed_when: false  # 상태 변화를 감지하지 않도록 설정
+  ignore_errors: yes
+  register: shell_output  # 이 결과를 다음 태스크에서 사용
+
+- name: Remove found shortcut files in wwwroot directory
+  win_shell: |
+    $LinkFiles = Get-ChildItem -Path "$env:SystemDrive\inetpub\wwwroot" -Recurse -Filter *.lnk
+    if ($LinkFiles) {
+        $LinkFiles | Remove-Item -Force
+        Write-Output "Deletion complete"
+    }
+  when: "'No shortcut files found.' not in shell_output.stdout"
+
+- name: Confirm deletion in wwwroot directory
+  debug:
+    msg: "Shortcut files deleted successfully"
+  when: "'No shortcut files found.' not in shell_output.stdout"
+

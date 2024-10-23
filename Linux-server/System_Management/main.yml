@@ -3,7 +3,7 @@
 
 - name: debug print
   debug:
-    msg: "test"
+    msg: "Linux Server 검사"
 
 - name: Inspect Finger Vulnerability
   import_tasks: ServiceFinger.yml
@@ -22,3 +22,21 @@
 
 - name: Inspect Sendmail Vulnerability
   import_tasks: Sendmail.yml
+
+- name: Password 복잡도 검사
+  import_tasks: sever_password.yml
+  
+- name: Password 복잡도 조치
+  import_tasks: sever_password_sol.yml
+
+- name: Password 변경일 검사
+  import_tasks: sever_password_max.yml
+
+- name: Password 변경일 조치
+  import_tasks: sever_password_max_sol.yml
+
+- name: Password 파일보호
+  import_tasks: sever_password_protect.yml
+
+- name: Password 파일보호 조치
+  import_tasks: sever_password_protect_sol.yml

@@ -19,5 +19,5 @@
       msg: |
         general_log : {{ result1.query_result[0][0].Value}}, log file 경로 : {{result1.query_result[0][1].Value}}
         slow_log : {{result2.query_result[0][1].Value}}, log file 경로 : {{result2.query_result[0][2].Value}}, launch_time : {{result2.query_result[0][0].Value}}
-        {{'log 기능이 활성화 되어 있습니다.' if result1.query_result[0][0].Value == 'ON' or result2.query_result[0][1].Value == 'ON' else 'log 기능이 비활성화 되어 있습니다.'}}
+        {{'양호: log 기능이 활성화 되어 있습니다.' if result1.query_result[0][0].Value == 'ON' or result2.query_result[0][1].Value == 'ON' else '취약: log 기능이 비활성화 되어 있습니다.'}}
 

@@ -8,7 +8,7 @@
 
   - name: grant_priv 설정 계정 정보
     debug:
-      msg: "{{ result.query_result[0]}}"
+      msg: "{{ result.query_result[0]}} 적절하게 권한이 부여되어 있는지 확인하세요."
 
   - name: select_priv 권한 부여 점검
     mysql_query:
@@ -19,5 +19,5 @@
 
   - name: select_priv 설정 계정 정보
     debug:
-      msg: "{{ result.query_result[0]}}"
+      msg: "{{ result.query_result[0]}} 적절하게 권한이 부여되어 있는지 확인하세요."
 

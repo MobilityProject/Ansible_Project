@@ -12,5 +12,5 @@
 
     - name: 현재 버전
       debug:
-        msg: "현재 버전 : {{ result.query_result[0][0]}}"
+        msg: "현재 버전 : {{ result.query_result[0][0]}} 최신버전을 확인하세요."
 

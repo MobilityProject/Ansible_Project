@@ -9,6 +9,6 @@
 
   - name: 계정 정보
     debug:
-      msg: "{{ result.query_result[0]}}"
+      msg: "{{ result.query_result[0]}} 불필요한 계정을 확인하세요."
     
 

@@ -4,15 +4,11 @@
   win_shell: |
     $service = Get-Service -Name W3SVC
     if ($service.Status -eq 'Running') {
-        Write-Output "IIS Service is Running"
+        Write-Output "Running"
     } else {
-        Write-Output "IIS Service is not Running"
+        Write-Output "not Running"
     }
   register: iis_service_status
-
-- name: Output IIS service status
-  debug:
-    msg: "{{ iis_service_status.stdout }}"
 
 # 2. 레지스트리의 DisableWebDAV 값 출력 및 값 수정
 - name: Get DisableWebDAV value from the registry using PowerShell
@@ -22,10 +18,6 @@
     $regValue = Get-ItemProperty -Path $regPath -Name $regName | Select-Object -ExpandProperty $regName
     Write-Output $regValue
   register: webdav_reg_value
-
-- name: Output DisableWebDAV registry value
-  debug:
-    msg: "Current DisableWebDAV value is {{ webdav_reg_value.stdout }}"
 
 - name: Set DisableWebDAV to 1 if not already set using PowerShell
   win_shell: |
@@ -44,4 +36,11 @@
   debug:
     msg: "{{ set_webdav_result.stdout }}"
 
+- name: Output IIS service status
+  debug:
+    msg: |
+      {{'양호: webdav 설정이 적절합니다.' if (iis_service_status.stdout == 'Running' and webdav_reg_value.stdout | int == 1) 
+      else '취약: webdev 설정이 부적절합니다.'}}
+      IIS Service is {{ iis_service_status.stdout }}
+      Current DisableWebDAV value is {{ webdav_reg_value.stdout }}
 

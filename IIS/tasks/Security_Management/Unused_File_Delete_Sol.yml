@@ -16,12 +16,6 @@
     }
   register: iis_version
 
-- name: Stdout Version
-  debug:
-    msg: >
-      {{'양호: 가상디렉터리가 존재하지 않습니다.' if (iis_version.stdout | float >= 7.0)}}
-      IIS Version : {{iis_version.stdout}}"
-
 - name: Define virtual directories to check
   set_fact:
     virtual_directories:
@@ -30,11 +24,12 @@
       - "C:\\Program Files\\Common Files\\System\\MSADC\\Sample"
   when: iis_version.stdout | float < 7.0
 
-- name: Check virtual directories if they exist
+- name: Check and remove virtual directories if they exist
   win_shell: |
     $dirPath = "{{dirPath}}"
     if (Test-Path $dirPath) {
-        Write-Output "Exist: $dirPath"
+        Remove-Item -Path $dirPath -Recurse -Force
+        Write-Output "Deleted: $dirPath"
     } else {
         Write-Output "Not found: $dirPath"
     }
@@ -42,11 +37,3 @@
   loop_control:
     loop_var: dirPath
   when: iis_version.stdout | float < 7.0  
-  register: directory_check_results
-
-- name: Check
-  debug:
-    msg: >
-      {{'양호: 가상디렉터리가 존재하지 않습니다.' if ('Exits' not indirectory_check_results) else 취약: 가상디렉터리가 존재합니다.}}
-      IIS Version : {{iis_version.stdout}}
-      {{directory_check_results}}

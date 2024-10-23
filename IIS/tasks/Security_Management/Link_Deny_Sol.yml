@@ -22,6 +22,6 @@
 
 - name: Confirm deletion in wwwroot directory
   debug:
-    msg: "{{'양호: 링크파일이 존재하지 않습니다.' if (No shortcut files found.' not in shell_output.stdout) else '취약: 링크파일이 존재합니다.' shell_output.stdout}}"
-
+    msg: "Shortcut files deleted successfully"
+  when: "'No shortcut files found.' not in shell_output.stdout"
 

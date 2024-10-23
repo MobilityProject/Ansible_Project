@@ -1,0 +1,147 @@
+---
+  #world writable file 비동기로 서치를 수행
+  - name: Search World Writable File
+    command: find / -xdev -type f -perm -2 
+    register: world_writable_list
+    async: 10 # 10초 이상 지날 경우 수행하지 않음 
+    poll: 0   
+    ignore_errors: yes
+    changed_when: false
+
+  # Path 환경 변수 획득
+  - name: File Authority Check
+    command: echo $PATH
+    register: path_variable
+    changed_when: false
+
+  # Path 환경 변수 내부에 .이 있을 경우를 확인
+  - name: Check for Dot in Path Variable
+    set_fact:
+      has_dot: "{{ path_variable.stdout is search('\\.') }}"
+  
+  # 점이 PATH 환경 변수에 포함된 경우 Fail 실패 메시지 출력
+  - name: Dot Include in Path Environment Variable
+    fail:
+      msg: "Dot detected in path environment variable"
+    when: has_dot
+    ignore_errors: yes
+      
+  # Get 점검파일 리스트 출력
+  - name: Get File State
+    stat:
+      path: "{{ item }}"
+    register: file_state
+    loop: "{{ file_list }}"
+  
+  - name: Change permissions to 0644 if greater
+    file:
+      path: "{{ item.item }}"
+      mode: '0644'
+    when: item.stat.exists and item.stat.path != '/etc/shadow' and item.stat.mode | string | length == 4 and item.stat.mode | string | int > 644
+    loop: "{{ file_state.results }}"
+
+  - name: Change File To Root
+    file:
+      path: "{{ item.item }}"
+      owner: root
+    when: item.stat.exists
+    loop: "{{ file_state.results }}"
+
+  - name: Extract Shadow Data
+    set_fact:
+      shadow_file: "{{ item }}"
+    loop: "{{ file_state.results }}"
+    when: item.stat.exists and item.stat.path == '/etc/shadow'
+
+  - name: Change Shadow Permissions to 0400 if greater
+    file:
+      path: "{{ shadow_file.path }}"
+      mode: '0400'
+    when: shadow_file is defined and shadow_file.stat.mode | string | length == 4 and shadow_file.stat.mode | string | int > 400
+
+  - name: Return true if rhosts and hosts.equiv is Exists
+    stat:
+      path: "{{ item }}"
+    register: rhosts_and_hosts_state
+    loop:
+      - /etc/hosts.equiv
+      - "{{ lookup('env', 'HOME') }}/.rhosts"
+
+  - name: Change Permissions to 0600 if rhosts and hosts.equiv permission is greater
+    file:
+      path: "{{ item.item }}"
+      mode: '0600'
+    loop: "{{ rhosts_and_hosts_state.results }}"
+    when: item.stat.exists and item.stat.mode | string | length == 4 and item.stat.mode | string | int > 600
+
+  - name: Get Crontab Information 
+    stat:
+      path: "{{ crontab_path }}"
+    register: crontab_info
+  
+  - name: Change Owner if Crontab File Owner isn't Root
+    file:
+      path: "{{ crontab_path }}"
+      owner: root
+    when: crontab_info.stat.pw_name != 'root'
+
+  - name: Change Permission if Crontab Permissions are Vulnerable
+    file:
+      path: "{{ crontab_path }}"
+      mode: '0640'
+    when: crontab_info.stat.exists and crontab_info.stat.mode | string | length == 4 and crontab_info.stat.mode | string | int > 640
+
+  - name: Get Cron Allow Deny info
+    stat:
+      path: "{{ item }}"
+    register: cron_allow_deny_info
+    loop:
+      - "{{ cron_allow_path }}"
+      - "{{ cron_deny_path }}"
+
+  - name: Change Permission if Cron allow and deny Permissions are Vulnerable
+    file:
+      path: "{{ item.item }}"
+      mode: '0640'
+    loop: "{{ cron_allow_deny_info.results }}"
+    when: item.stat.exists and item.stat.mode | string | length == 4 and item.stat.mode | string | int > 640
+
+  - name: Change Owner if Cron allow and deny File Onwer isn't root
+    file:
+      path: "{{ item.item }}"
+      owner: root
+    loop: "{{ cron_allow_deny_info.results }}"
+    when: item.stat.exists and item.stat.pw_name != 'root'
+
+  - name: Wait for the async find command to complete
+    async_status:
+      jid: "{{ world_writable_list.ansible_job_id }}"
+    register: job_result
+    until: job_result.finished
+    retries: 3
+    delay: 2
+    changed_when: false
+
+  - name: Change World Writable File Permission
+    file:
+      path: "{{ item }}"
+      mode: 'o-w'
+    loop: "{{ job_result.stdout_lines }}" 
+    when: job_result.stdout_lines is defined and item in job_result.stdout_lines
+    ignore_errors: yes
+
+  - name: Search Unknown User and Unknown Group File
+    command: find /etc /tmp /bin /sbin \( -nouser -o -nogroup \) -xdev -exec ls -al {} \; 2> /dev/null
+    register: unknown_reference_file
+    ignore_errors: yes
+    changed_when: false
+
+
+  - name: Delete Unknown Reference File
+    file:
+      path: "{{ item }}"
+      state: absent
+    loop: "{{ unknown_reference_file.results }}" 
+    when: unknown_referenec_file is defined
+    ignore_errors: yes
+

@@ -1,0 +1,7 @@
+---
+- name: 모든 호스트에 대해 Ping 확인
+  hosts: all
+  tasks:
+
+  - name: Return True If NFS Service is Exists
+    ping:

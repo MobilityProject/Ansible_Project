@@ -1,0 +1,14 @@
+---
+
+  - name: 계정 점검
+    mysql_query:
+      login_user: root
+      query: "select user, host from mysql.user;"
+    register: result
+    ignore_errors: yes
+
+  - name: 계정 정보
+    debug:
+      msg: "{{ result.query_result[0]}}"
+    
+

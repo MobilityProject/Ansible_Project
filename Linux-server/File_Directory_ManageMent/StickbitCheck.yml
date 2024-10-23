@@ -1,0 +1,16 @@
+---
+- name: sticky test
+  hosts: 10.0.2.15
+  tasks:
+    - name: Get Stickbit FileList
+      command: find / -user root -type f \( -perm -4000 -o -perm -2000 \) -exec ls -lg {} \;
+      register: stickybit_file_list
+      ignore_errors: yes
+      changed_when: false
+    
+    - name: Print StickyBit Files
+      debug:
+        msg: "{{ item }}"
+      loop: "{{ stickybit_file_list.stdout_lines }}"
+      when: stickybit_file_list is defined
+   

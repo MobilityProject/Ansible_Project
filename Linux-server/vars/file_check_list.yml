@@ -1,0 +1,12 @@
+file_list:
+  - /etc/passwd
+  - /etc/shadow
+  - /etc/hosts
+  - /etc/xinetd.conf
+  - /etc/rsyslog.conf
+  - /etc/services
+  - /etc/test/text.txt
+
+crontab_path: /etc/crontab
+cron_allow_path: /etc/cron.allow
+cron_deny_path: /etc/cron.deny

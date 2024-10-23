@@ -1,0 +1,97 @@
+---
+- name: Sendmail setting Check
+  hosts: all
+  become: yes
+  tasks:
+    - name: Sendmail 프로세스 확인
+      shell: "ps -ef | grep sendmail | grep -v grep"
+      register: sendmail_process
+      ignore_errors: yes
+
+    - name: Sendmail 프로세스 결과 표기
+      debug:
+        msg: "{{ sendmail_process.stdout if sendmail_process.stdout else 'Sendmail 프로세스가 실행 중이지 않습니다.' }}"
+
+    - name: /etc/mail/sendmail.cf 파일에서 DZ 값 확인
+      shell: "cat /etc/mail/sendmail.cf | grep DZ"
+      register: sendmail_dz
+      ignore_errors: yes
+
+    - name: DZ 버전 검사
+      set_fact:
+        dz_version_status: >
+          {% if sendmail_dz.stdout is not defined %}
+            N/A
+          {% else %}
+            {% set dz_version = sendmail_dz.stdout.split('DZ')[-1] | trim %}
+            {% if dz_version >= '8.14.9' %}
+              ok
+            {% else %}
+              fail
+            {% endif %}
+          {% endif %}
+
+    - name: Sendmail 상태 및 버전 결과 출력
+      debug:
+        msg: |
+          Sendmail 프로세스 결과:
+          DZ 값 확인 결과: {{ sendmail_dz.stdout if sendmail_dz.stdout else 'N/A' }}
+
+          DZ 버전 검사 결과: {{ dz_version_status }}
+
+
+    - name: Sendmail 프로세스 확인
+      shell: "ps -ef | grep sendmail | grep -v grep"
+      register: sendmail_process
+      ignore_errors: yes
+
+    - name: Sendmail 프로세스 결과 표기
+      debug:
+        msg: "{{ sendmail_process.stdout if sendmail_process.stdout else 'Sendmail 프로세스가 실행 중이지 않습니다.' }}"
+
+    - name: R$* 라인 확인
+      shell: "grep -E 'R\\$.*Relaying denied' /etc/mail/sendmail.cf"
+      register: grep_result
+      ignore_errors: yes
+
+    - name: 주석 여부 검사
+      set_fact:
+        line_status: >
+          {% if grep_result.stdout is not defined or grep_result.stdout == '' %}
+            N/A
+          {% elif grep_result.stdout.startswith('#') %}
+            fail
+          {% else %}
+            ok
+          {% endif %}
+
+    - name: 검사 결과 출력
+      debug:
+        msg: |
+          R$* 라인 검사 결과: {{ grep_result.stdout if grep_result.stdout else 'N/A' }}
+          검사 상태: {{ line_status }}
+
+
+    - name: Check if restrictqrun is in PrivacyOptions
+      command: grep "PrivacyOptions" /etc/mail/sendmail.cf
+      register: privacy_options_output
+      ignore_errors: yes
+
+    - name: Check for restrictqrun
+      fail:
+        msg: "Fail: restrictqrun is not found in PrivacyOptions"
+      when: "'restrictqrun' not in privacy_options_output.stdout"
+
+    - name: Report success
+      debug:
+        msg: "Success: restrictqrun is present in PrivacyOptions"
+      when: "'restrictqrun' in privacy_options_output.stdout"
+
+    - name: Add restrictqrun to PrivacyOptions if not present
+      lineinfile:
+        path: /etc/mail/sendmail.cf
+        regexp: '^PrivacyOptions.*'
+        line: "{{ privacy_options_output.stdout }}:restrictqrun"
+        backrefs: yes
+      when: "'restrictqrun' not in privacy_options_output.stdout"
+      ignore_errors: yes

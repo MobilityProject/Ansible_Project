@@ -1,0 +1,23 @@
+---
+  - name: grant_pirv 권한 부여 점검
+    mysql_query:
+      login_user: root
+      query: "select user, host, Grant_priv from mysql.user where Grant_priv='Y';"
+    register: result
+    ignore_errors: yes
+
+  - name: grant_priv 설정 계정 정보
+    debug:
+      msg: "{{ result.query_result[0]}}"
+
+  - name: select_priv 권한 부여 점검
+    mysql_query:
+      login_user: root
+      query: "select user, host, select_priv from mysql.user;"
+    register: result
+    ignore_errors: yes
+
+  - name: select_priv 설정 계정 정보
+    debug:
+      msg: "{{ result.query_result[0]}}"
+

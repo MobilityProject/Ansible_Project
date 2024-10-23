@@ -1,0 +1,14 @@
+---
+
+  - name: 환경설정 파일 권한 점검
+    shell: ls -alL /etc/my.cnf.d/mysql-server.cnf
+    register: result
+    ignore_errors: yes
+
+  - name: 환경설정 파일 권한 확인
+    debug:
+      msg: >
+        현재 파일 정보: {{ result.stdout_lines[0]}} 
+        {{'\n권한이 적절합니다.' if (result.stdout_lines[0][3] == '-' and result.stdout_lines[0][5:10] == '-----') else '\n권한이 부적절합니다.'}}
+
+

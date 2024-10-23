@@ -19,3 +19,6 @@
 
 - name: Inspect DNS Vulnerability
   import_tasks: DNS.yml
+
+- name: Inspect Sendmail Vulnerability
+  import_tasks: Sendmail.yml

@@ -3,5 +3,5 @@
   hosts: all
   tasks:
 
-  - name: Return True If NFS Service is Exists
+  - name: ping 때리기
     ping:

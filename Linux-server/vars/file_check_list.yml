@@ -7,6 +7,12 @@ file_list:
   - /etc/services
   - /etc/test/text.txt
 
+environment_file_list:
+  - /.bash_profile
+  - /.bashrc
+  - /.profile
+  - /.bash_logout
+
 crontab_path: /etc/crontab
 cron_allow_path: /etc/cron.allow
 cron_deny_path: /etc/cron.deny

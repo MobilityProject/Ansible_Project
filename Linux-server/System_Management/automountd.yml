@@ -1,18 +1,21 @@
 ---
-
-  - name: Check AutoMountd
+  # AutoMountd 관련 프로세스 PID 얻어오는 함수
+  - name: Get Every AutoMountd Processes Pid
     command: pgrep automountd
     register: automountd_pid
     ignore_errors: yes
     changed_when: false
     failed_when: automountd_pid.rc != 0 and automountd_pid.stdout_lines | length > 0
     
+  # AutoMountd 관련 프로세스 종료
   - name: Kill AutoMountd
     shell: kill -9 {{ item }}
     when: item is defined
     loop: "{{ automountd_pid.stdout_lines }}"
     register: kill_result
-    
+
+
+  # 종료시킨 프로세스 리스트 출력
   - name: Print Result of kill
     debug:
       msg: "Killed NFS daemon with Pid: {{ item }}"

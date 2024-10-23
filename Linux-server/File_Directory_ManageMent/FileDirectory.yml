@@ -19,12 +19,14 @@
     set_fact:
       has_dot: "{{ path_variable.stdout is search('\\.') }}"
   
+  # 점이 PATH 환경 변수에 포함된 경우 Fail 실패 메시지 출력
   - name: Dot Include in Path Environment Variable
     fail:
       msg: "Dot detected in path environment variable"
     when: has_dot
     ignore_errors: yes
       
+  # Get 점검파일 리스트 출력
   - name: Get File State
     stat:
       path: "{{ item }}"

@@ -1,19 +1,23 @@
 ---
+
+  # 점검 서비스네임 가져오는 구문
 - name: include service names
   include_vars:
     file: ../vars/vulnerablity_rtype_services.yml
 
+  # Finger service가 존재하는 xinet.d 파일이 존재하는 지 확인
 - name: Get Result Finger Service is Exist
   stat:
     path: /etc/xinet.d
   register: stat_status
 
-- name: Check Is Exist
+  # 해당 파일이 존재하는 경우 해당 파일 존재한다 알림
+- name: xInet Is Exist
   debug:
-    msg: "inetd Folder doesn't Exist"
+    msg: "xinetd Folder doesn't Exist"
   when: not stat_status.stat.exists
 
-
+  # Finger Service가 존재하는 지 확인 
 - name: Check Finger Service Status
   systemd:
     name: finger
@@ -22,17 +26,20 @@
   failed_when: service_status is defined
   ignore_errors: yes
 
-- name: Return true If finger Service does not exist
-  fail:
+  # Finger serivce가 존재하지 않을 시에 
+- name: Return True If finger Service does not exist
+  Debug:
     msg: "Finger Service Exists"
   when: service_status is succeeded
 
-- name: Return true If isExist rTypeFile
+  # r타입 서비스 관련한 설정 File 존재 여부 확인하는 함수
+- name: Return True If isExist rTypeFile
   stat:
     path: "/etc/xinet.d/{{ item }}"
   register: rtype_stat_status
   loop: "{{ check_services }}"
 
+  # r타입 서비스들이 존재할 경우 해당 설정 파일에서 disable 설정
 - name: Modify Service File If rTypeFile is Exists
   lineinfile:
     path: "/etc/xinet.d/{{ item }}"

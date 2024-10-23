@@ -3,8 +3,6 @@
   hosts: localhost
   connection: local
   become: yes
-  vars:
-    - password: "dkagh1."
   tasks:
   - name: include service names
     include_vars:

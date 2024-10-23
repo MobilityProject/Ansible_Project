@@ -1,0 +1,33 @@
+---
+- name: Check AutoMountd
+  hosts: all
+  become: yes
+  tasks:
+  - name: Check AutoMountd
+    command: pgrep automountd
+    register: automountd_pid
+    ignore_errors: yes
+    changed_when: false
+    failed_when: automountd_pid.rc != 0 and automountd_pid.stdout_lines | length > 0
+
+  - name: Print AutoMountd 상태
+    debug:
+      msg: >
+        {% if automountd_pid.rc == 0 %}
+          취약: automount 서비스가 활성화 되어 있습니다.
+        {% else %}
+          양호: automount 서비스가 비활성화 되어 있습니다.
+        {% endif %}
+
+  - name: Kill AutoMountd
+    shell: kill -9 {{ item }}
+    when: item is defined
+    loop: "{{ automountd_pid.stdout_lines }}"
+    register: kill_result
+    
+  - name: Print Result of kill
+    debug:
+      msg: "NFS 데몬을 종료했습니다. PID: {{ item }}"
+    loop: "{{ kill_result.results }}"
+    when: item is defined and item.rc == 0
+

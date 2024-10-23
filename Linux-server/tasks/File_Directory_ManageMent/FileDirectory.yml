@@ -1,0 +1,178 @@
+---
+- name: 인증 테스트
+  hosts: 10.0.2.15
+  tasks:
+    # World Writable 파일을 비동기로 검색
+    - name: World Writable 파일 검색
+      command: find / -xdev -type f -perm -2
+      register: world_writable_list
+      async: 10 # 10초 이상 경과할 경우 실행하지 않음
+      poll: 0
+      ignore_errors: yes
+      changed_when: false
+
+    # PATH 환경 변수 획득
+    - name: 파일 권한 확인
+      command: echo $PATH
+      register: path_variable
+      changed_when: false
+
+    # PATH 환경 변수에 점(.) 포함 여부 확인
+    - name: PATH 환경 변수에 점(.) 포함 여부 확인
+      set_fact:
+        has_dot: "{{ path_variable.stdout is search('\\.') }}"
+
+    - name: PATH 환경 변수에 점(.) 포함 시 실패 처리
+      fail:
+        msg: "취약: PATH 환경 변수에 점(.)이 포함되어 있습니다."
+      when: has_dot
+      ignore_errors: yes
+
+    # 파일 상태 확인
+    - name: 파일 상태 확인
+      stat:
+        path: "{{ item }}"
+      register: file_state
+      loop: "{{ file_list }}"
+
+    # 파일 권한을 0644로 변경 (필요 시)
+    - name: 파일 권한을 0644로 변경
+      file:
+        path: "{{ item.item }}"
+        mode: '0644'
+      when: item.stat.exists and item.stat.path != '/etc/shadow' and item.stat.mode | string | length == 4 and item.stat.mode | string | int > 644
+      loop: "{{ file_state.results }}"
+
+    # 파일 소유자를 root로 변경
+    - name: 파일 소유자를 root로 변경
+      file:
+        path: "{{ item.item }}"
+        owner: root
+      when: item.stat.exists
+      loop: "{{ file_state.results }}"
+
+    # /etc/shadow 데이터 추출
+    - name: /etc/shadow 데이터 추출
+      set_fact:
+        shadow_file: "{{ item }}"
+      loop: "{{ file_state.results }}"
+      when: item.stat.exists and item.stat.path == '/etc/shadow'
+
+    # /etc/shadow 파일의 권한을 0400으로 변경 (필요 시)
+    - name: /etc/shadow 파일의 권한을 0400으로 변경
+      file:
+        path: "{{ shadow_file.path }}"
+        mode: '0400'
+      when: shadow_file is defined and shadow_file.stat.mode | string | length == 4 and shadow_file.stat.mode | string | int > 400
+
+    # rhosts와 hosts.equiv 파일 존재 여부 확인
+    - name: rhosts와 hosts.equiv 파일 존재 여부 확인
+      stat:
+        path: "{{ item }}"
+      register: rhosts_and_hosts_state
+      loop:
+        - /etc/hosts.equiv
+        - "{{ lookup('env', 'HOME') }}/.rhosts"
+
+    # rhosts와 hosts.equiv 파일의 권한을 0600으로 변경 (필요 시)
+    - name: rhosts와 hosts.equiv 파일의 권한을 0600으로 변경
+      file:
+        path: "{{ item.item }}"
+        mode: '0600'
+      loop: "{{ rhosts_and_hosts_state.results }}"
+      when: item.stat.exists and item.stat.mode | string | length == 4 and item.stat.mode | string | int > 600
+
+    # Crontab 파일 정보 확인
+    - name: Crontab 파일 정보 확인
+      stat:
+        path: "{{ crontab_path }}"
+      register: crontab_info
+
+    # Crontab 파일 소유자를 root로 변경 (필요 시)
+    - name: Crontab 파일 소유자를 root로 변경
+      file:
+        path: "{{ crontab_path }}"
+        owner: root
+      when: crontab_info.stat.pw_name != 'root'
+
+    # Crontab 파일 권한을 0640으로 변경 (필요 시)
+    - name: Crontab 파일 권한을 0640으로 변경
+      file:
+        path: "{{ crontab_path }}"
+        mode: '0640'
+      when: crontab_info.stat.exists and crontab_info.stat.mode | string | length == 4 and crontab_info.stat.mode | string | int > 640
+
+    # Cron allow와 deny 파일 정보 확인
+    - name: Cron allow와 deny 파일 정보 확인
+      stat:
+        path: "{{ item }}"
+      register: cron_allow_deny_info
+      loop:
+        - "{{ cron_allow_path }}"
+        - "{{ cron_deny_path }}"
+
+    # Cron allow와 deny 파일의 권한을 0640으로 변경 (필요 시)
+    - name: Cron allow와 deny 파일의 권한을 0640으로 변경
+      file:
+        path: "{{ item.item }}"
+        mode: '0640'
+      loop: "{{ cron_allow_deny_info.results }}"
+      when: item.stat.exists and item.stat.mode | string | length == 4 and item.stat.mode | string | int > 640
+
+    # Cron allow와 deny 파일 소유자를 root로 변경 (필요 시)
+    - name: Cron allow와 deny 파일 소유자를 root로 변경
+      file:
+        path: "{{ item.item }}"
+        owner: root
+      loop: "{{ cron_allow_deny_info.results }}"
+      when: item.stat.exists and item.stat.pw_name != 'root'
+
+    # 비동기 find 명령이 완료될 때까지 대기
+    - name: 비동기 find 명령 완료 대기
+      async_status:
+        jid: "{{ world_writable_list.ansible_job_id }}"
+      register: job_result
+      until: job_result.finished
+      retries: 3
+      delay: 2
+      changed_when: false
+
+    # World Writable 파일의 권한 변경
+    - name: World Writable 파일의 권한 변경
+      file:
+        path: "{{ item }}"
+        mode: 'o-w'
+      loop: "{{ job_result.stdout_lines }}"
+      when: job_result.stdout_lines is defined and item in job_result.stdout_lines
+      ignore_errors: yes
+
+    # World Writable 파일 권한 변경 후 상태 확인
+    - name: World Writable 파일 권한 변경 후 상태 확인
+      debug:
+        msg: >
+          {% if job_result.stdout_lines | length > 0 %}
+          취약 - World Writable 파일이 존재하여 쓰기 권한을 제거했습니다: {{ job_result.stdout_lines }}
+          {% else %}
+          양호 - World Writable 파일이 발견되지 않았습니다.
+          {% endif %}
+
+    # 알 수 없는 사용자 및 그룹 파일 검색
+    - name: 알 수 없는 사용자 및 그룹 파일 검색
+      command: find /etc /tmp /bin /sbin \( -nouser -o -nogroup \) -xdev -exec ls -al {} \; 2> /dev/null
+      register: unknown_reference_file
+      ignore_errors: yes
+      changed_when: false
+
+    # 알 수 없는 참조 파일 삭제
+    - name: 알 수 없는 참조 파일 삭제
+      file:
+        path: "{{ item }}"
+        state: absent
+      loop: "{{ unknown_reference_file.results }}"
+      when: unknown_reference_file is defined
+      ignore_errors: yes
+
+    # World Writable 파일 권한 조치 결과 메시지
+    - name: World Writable 파일 권한 조치 결과 메시지
+      debug:
+        msg: "World Writable 파일의 권한 조치가 완료되었습니다. 취약점 해결을 위해 파일의 쓰기 권한을 제거했습니다."

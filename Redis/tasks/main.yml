@@ -6,7 +6,7 @@
     msg: "test"
 
 - name: Security settings and permissions management
-  import_tasks: Redis_account_security.yml
+  import_tasks: /Account_Security_Setting/redis_account_security.yml
 
 - name: Enabling Logs
-  import_tasks: Redis_Log
+  import_tasks: /Account_Security_Setting/redis_Log

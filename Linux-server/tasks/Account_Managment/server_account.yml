@@ -1,0 +1,115 @@
+---
+- name: Check pts settings in /etc/securetty
+  hosts: all
+  become: yes
+
+  tasks:
+    - name: Gather facts
+      ansible.builtin.setup:
+
+    - name: Check for pts settings in /etc/securetty on Debian-based systems
+      when: ansible_facts['os_family'] == "Debian"
+      command: grep -E '^pts/[0-9]+' /etc/securetty
+      register: pts_settings_debian
+      ignore_errors: yes
+
+    - name: Check for pts settings in /etc/securetty on Red Hat-based systems
+      when: ansible_facts['os_family'] == "RedHat"
+      command: grep -E '^pts/[0-9]+' /etc/securetty
+      register: pts_settings_redhat
+      ignore_errors: yes
+
+    - name: Report if pts settings do not exist on Debian-based systems
+      debug:
+        msg: "취약: /etc/securetty 파일에 pts 설정이 없습니다 (Debian 계열). 터미널 접속 보안에 문제가 있을 수 있습니다."
+      when: 
+        - ansible_facts['os_family'] == "Debian"
+        - pts_settings_debian.stdout == ""
+
+    - name: Report if pts settings do not exist on Red Hat-based systems
+      debug:
+        msg: "취약: /etc/securetty 파일에 pts 설정이 없습니다 (Red Hat 계열). 터미널 접속 보안에 문제가 있을 수 있습니다."
+      when: 
+        - ansible_facts['os_family'] == "RedHat"
+        - pts_settings_redhat.stdout == ""
+
+    - name: Report if pts settings exist on Debian-based systems
+      debug:
+        msg: "안전: /etc/securetty 파일에 pts 설정이 존재합니다 (Debian 계열). 터미널 접속 설정이 올바르게 구성되었습니다."
+      when: 
+        - ansible_facts['os_family'] == "Debian"
+        - pts_settings_debian.stdout != ""
+
+    - name: Report if pts settings exist on Red Hat-based systems
+      debug:
+        msg: "안전: /etc/securetty 파일에 pts 설정이 존재합니다 (Red Hat 계열). 터미널 접속 설정이 올바르게 구성되었습니다."
+      when: 
+        - ansible_facts['os_family'] == "RedHat"
+        - pts_settings_redhat.stdout != ""
+
+
+
+    - name: Check for PermitRootLogin setting
+      command: grep -Ei '^\s*PermitRootLogin\s+no' /etc/ssh/sshd_config
+      register: permit_root_login_check
+      ignore_errors: yes
+
+    - name: Check for commented PermitRootLogin setting
+      command: grep -Ei '^\s*#\s*PermitRootLogin' /etc/ssh/sshd_config
+      register: commented_permit_root_login_check
+      ignore_errors: yes
+
+    - name: Fail if PermitRootLogin is not found or is commented
+      fail:
+        msg: "취약: /etc/ssh/sshd_config 파일에 PermitRootLogin no가 설정되어 있지 않거나 주석 처리되어 있습니다."
+      when:
+        - permit_root_login_check.stdout == ""
+        - commented_permit_root_login_check.stdout != ""
+      ignore_errors: yes
+
+    - name: Add PermitRootLogin no under # Authentication if vulnerable
+      ansible.builtin.lineinfile:
+        path: /etc/ssh/sshd_config
+        insertafter: '^#\s*PermitRootLogin\s+prohibit-password'
+        line: 'PermitRootLogin no'
+        state: present
+      when:
+        - permit_root_login_check.stdout == ""
+        - commented_permit_root_login_check.stdout != ""
+      ignore_errors: yes
+
+
+    - name: Check for PermitRootLogin setting
+      command: grep -Ei '^\s*PermitRootLogin\s+no' /etc/ssh/sshd_config
+      register: permit_root_login_check
+      ignore_errors: yes
+
+    - name: Check for commented PermitRootLogin setting
+      command: grep -Ei '^\s*#\s*PermitRootLogin' /etc/ssh/sshd_config
+      register: commented_permit_root_login_check
+      ignore_errors: yes
+
+    - name: Fail if PermitRootLogin is not found or is commented
+      fail:
+        msg: "취약: /etc/ssh/sshd_config 파일에 PermitRootLogin no가 설정되어 있지 않거나 주석 처리되어 있습니다."
+      when:
+        - permit_root_login_check.stdout == ""
+        - commented_permit_root_login_check.stdout != ""
+      ignore_errors: yes
+
+    - name: Add PermitRootLogin no under # Authentication if vulnerable
+      ansible.builtin.lineinfile:
+        path: /etc/ssh/sshd_config
+        insertafter: '^#\s*PermitRootLogin\s+prohibit-password'
+        line: 'PermitRootLogin no'
+        state: present
+      when:
+        - permit_root_login_check.stdout == ""
+        - commented_permit_root_login_check.stdout != ""
+      ignore_errors: yes
+
+    - name: Check PermitRootLogin no existence
+      debug:
+        msg: "양호: root 계정의 원격 접속이 제한되어 있습니다."
+      when:
+        - permit_root_login_check.stdout != ""

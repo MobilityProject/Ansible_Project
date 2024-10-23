@@ -1,0 +1,49 @@
+---
+# tasks file for linux-server
+
+- name: debug print
+  debug:
+    msg: "test"
+
+- name: Remote access restrictions
+  import_tasks: /Account_Managment/server_account.yml
+
+- name: Configuring Complexity
+  import_tasks: /Account_Managment/server_password.yml
+
+- name: Setting thresholds
+  import_tasks: /Account_Managment/server_Threshold.yml
+
+- name: Set the maximum usage period
+  import_tasks: /Account_Managment/server_password_max.yml
+
+- name: Protection
+  import_tasks: /Account_Managment/server_password_protect.yml
+
+
+- name: file directory
+  import_tasks: /File_Directory_ManageMent/FileDirectory.yml
+
+- name: StickbitCheck
+  import_tasks: /File_Directory_ManageMent/StickbitCheck.yml
+
+
+- name: Inspect Finger Vulnerability
+  import_tasks: /System_Management/ServiceFinger.yml
+
+- name: Inspect FTP Service Vulnerability
+  import_tasks: /System_Management/FTP.yml
+
+- name: Inspect NFS Service Vulnerability
+  import_tasks: /System_Management/NFS.yml
+
+- name: Inspect AutoMountd Vulnerability
+  import_tasks: /System_Management/automountd.yml
+
+- name: Inspect DNS Vulnerability
+  import_tasks: /System_Management/DNS.yml
+
+- name: Inspect Sendmail Vulnerability
+  import_tasks: /System_Management/Sendmail.yml
+
+

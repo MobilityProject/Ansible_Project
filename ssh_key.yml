@@ -17,7 +17,6 @@
     become_user: "semaphore"
     command: >
       ssh-keygen -t rsa -b 4096 -f /home/semaphore/.ssh/id_rsa -N "{{ '' }}"
-    register: ssh_keygen_result
     when: not ssh_key
     ignore_errors: yes
 
@@ -27,6 +26,7 @@
     ignore_errors: yes
 
   - name: ssh key deploy
+    become: yes
     shell: sshpass -p "{{password}}" ssh-copy-id -i /home/semaphore/.ssh/id_rsa.pub {{ item }}
     loop: "{{user}}"
     register: result

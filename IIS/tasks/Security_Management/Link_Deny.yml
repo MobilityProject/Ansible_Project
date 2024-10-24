@@ -19,9 +19,16 @@
         Write-Output "Deletion complete"
     }
   when: "'No shortcut files found.' not in shell_output.stdout"
+  ignore_errors: yes
+  
+- name: Confirm deletion in wwwroot directory
+  fail:
+    msg: "{{'취약: 링크파일이 존재합니다.' shell_output.stdout}}"
+  when: 'No shortcut files found.'' in shell_output.stdout
+  ignore_errors: yes
 
 - name: Confirm deletion in wwwroot directory
   debug:
-    msg: "{{'양호: 링크파일이 존재하지 않습니다.' if (No shortcut files found.' not in shell_output.stdout) else '취약: 링크파일이 존재합니다.' shell_output.stdout}}"
-
-
+    msg: "{{'양호: 링크파일이 존재하지 않습니다.' shell_output.stdout}}"
+  when: "'No shortcut files found.' not in shell_output.stdout"
+  ignore_errors: yes

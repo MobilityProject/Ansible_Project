@@ -26,6 +26,17 @@
   register: check_results
 
 - name: Print results
+  fail:
+    msg: >
+      {{item}}
+  loop: check_results.stdout_lines
+  when: "'양호' not in check_results.stdout_lines"
+  ignore_errors: yes
+- name: Print results
   debug:
-    var: check_results.stdout_lines
+    msg: >
+      {{item}}
+  loop: check_results.stdout_lines
+  when: "'양호' in check_results.stdout_lines"
+  ignore_errors: yes
 

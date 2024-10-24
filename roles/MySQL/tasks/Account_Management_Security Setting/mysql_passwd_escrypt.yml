@@ -1,0 +1,15 @@
+---
+  - name: 암호화 알고리즘 점검
+    mysql_query:
+      login_user: root
+      query: "select host, user, plugin, authentication_string from mysql.user;"
+    register: result
+    ignore_errors: yes
+
+  - name: 추출한 암호화 알고리즘 확인
+    debug:
+      msg: >
+       {{'양호: 알고리즘이 적합합니다.' if item.plugin == 'caching_sha2_password' else '취약: 알고리즘이 부적절합니다. caching_sha2_password 알고리즘을 사용하세요.'}}
+        사용자: {{ item.user }}, 플러그인: {{ item.plugin }} 
+    loop: "{{ result.query_result[0] }}"
+    

@@ -1,0 +1,12 @@
+check_services:
+  - rlogin
+  - rsh
+  - rexec
+  - echo
+  - discard
+  - daytime
+  - chargen
+  - rstatd
+  - tftp
+  - talk
+  - ntalk

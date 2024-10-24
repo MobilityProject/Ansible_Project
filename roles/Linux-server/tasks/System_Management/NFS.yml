@@ -1,0 +1,57 @@
+---
+  
+  
+  - name: NFS 서비스 확인
+    command: pgrep nfsd
+    register: nfsd_pid
+    ignore_errors: yes
+    changed_when: false
+  
+  - name: NFS 서비스 상태 출력
+    debug:
+      msg: >
+        {% if nfsd_pid.stdout_lines | length > 0 %}
+          취약: NFS 서비스가 활성화되어 있습니다.
+        {% else %}
+          양호: NFS 서비스가 비활성화되어 있습니다.
+        {% endif %}
+  
+  - name: Kill NFS Deamon
+    shell: kill -9 {{ item }}
+    when: item is defined
+    loop: "{{ nfsd_pid.stdout_lines }}"
+    register: kill_result
+  
+  - name: Kill NFS Daemon 결과 출력
+    debug:
+      msg: "Killed NFS daemons with Pid: {{ item }}"
+    loop: "{{ kill_result.results }}"
+    when: item is defined and item.rc == 0
+  
+  - name: NIS 또는 NIS+ 서비스 확인
+    shell: ps -ef | egrep "ypserv|ypbind|ypxfrd|rpc.yppasswdd|rpc.ypupdated" | grep -v "grep"
+    register: nis_processes
+    ignore_errors: yes
+    changed_when: false
+  
+  - name: NIS 프로세스 상태 출력
+    debug:
+      msg: >
+        {% if nis_processes.stdout_lines | length > 0 %}
+          취약: NIS 서비스가 활성화되어 있습니다.
+        {% else %}
+          양호: NIS 서비스가 비활성화되어 있습니다.
+        {% endif %}
+  
+  - name: Kill NIS Processes
+    shell: kill -9 {{ item }}
+    when: item is defined
+    loop: "{{ nis_processes.stdout_lines }}"
+    register: kill_nis_result
+  
+  - name: Kill NIS Process 결과 출력
+    debug:
+      msg: "Killed NIS processes with Pid: {{ item }}"
+    loop: "{{ kill_nis_result.results }}"
+    when: item is defined and item.rc == 0
+  

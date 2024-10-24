@@ -1,8 +1,4 @@
 ---
-- name: 모든 호스트에 대해 Ping 확인
-  hosts: test
-  tasks:
+- name: ping 때리기
+  ping:
 
-  - name: ping 때리기
-    ping:
-    ignored_errors: yes

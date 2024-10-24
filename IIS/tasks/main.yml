@@ -9,9 +9,12 @@
   win_service:
     name: W3SVC
     state: started
-  register: iis_service_state
+  register: iis_service
   when: ansible_os_family == 'Windows'
-
+ 
+- name: Debug Massage 
+  debug:
+    msg: "{{iis_service.state}}"
 
 - block:
   - name: Start for Cgi_Restrict.yml

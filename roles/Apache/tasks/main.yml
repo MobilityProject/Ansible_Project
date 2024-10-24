@@ -1,24 +1,32 @@
 ---
-# main.yml: Execute the Apache configuration checks and tasks
-
-- name: Apache 기능 점검 로직 수행
-  block:
-  - name: Execute web service separation task
-    import_tasks: ./access_control/process_directory.yml
-
-  - name: Execute limit upload and download size task
-    import_tasks: ./secruity/limit_upload_download.yml
-
-  - name: Execute web service separation for DocumentRoot task
-    import_tasks: ./secruity/web_service_separation.yml
-  when: "'apache2' in services or 'httpd' in services"
-
-- name: Skipping Apache scan Logic
-  debug:
-    msg: "아파치 서비스가 발견되지 않아 해당 서비스에서 아파치 검사를 수행하지 않습니다."
-  when: "'apache2' in services and 'httpd' in services"
-
-- name: Apache scan Logic is Done
-  debug:
-    msg: "아파치 취약점 검사 및 조치가 수행되었습니다."
-  when: "'apache2' in services and 'httpd' in services"
+  # main.yml: Execute the Apache configuration checks and tasks
+  
+  - name: Check if httpd Service is Running
+    yum:
+      name: httpd
+      state: installed
+    register: httpd_installed
+    ignore_errors: yes
+         
+  - name: Apache 기능 점검 로직 수행
+    block:
+    - name: Execute web service separation task
+      import_tasks: ./access_control/process_directory.yml
+  
+    - name: Execute limit upload and download size task
+      import_tasks: ./secruity/limit_upload_download.yml
+  
+    - name: Execute web service separation for DocumentRoot task
+      import_tasks: ./secruity/web_service_separation.yml
+    when: httpd_installed is defined
+    ignore_errors: yes
+  
+  - name: Skipping Apache scan Logic
+    debug:
+      msg: "아파치 서비스가 발견되지 않아 해당 서비스에서 아파치 검사를 수행하지 않습니다."
+    when: httpd_installed is not defined
+    
+  - name: Apache scan Logic is Done
+    debug:
+      msg: "아파치 취약점 검사 및 조치가 수행되었습니다."
+    when: httpd_installed is defined

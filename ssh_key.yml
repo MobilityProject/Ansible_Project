@@ -27,10 +27,8 @@
 
   - name: ssh key deploy
     become: yes
-    shell: sshpass -p {{item.password}} ssh-copy-id -i /home/semaphore/.ssh/id_rsa.pub {{ item.user }}
-    loop: 
-      - {{user}}
-      - {{password}}
+    shell: sshpass -p {{item.1}} ssh-copy-id -i /home/semaphore/.ssh/id_rsa.pub {{ item.0 }}
+    loop: "{{ lookup('zip', user, password) }}"
     register: result
     ignore_errors: yes
 

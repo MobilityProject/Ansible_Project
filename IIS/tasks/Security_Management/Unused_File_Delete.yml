@@ -45,8 +45,20 @@
   register: directory_check_results
 
 - name: Check
-  debug:
+  fail:
     msg: >
-      {{'양호: 가상디렉터리가 존재하지 않습니다.' if ('Exits' not indirectory_check_results) else 취약: 가상디렉터리가 존재합니다.}}
+      {{' 취약: 가상디렉터리가 존재합니다.'}}
       IIS Version : {{iis_version.stdout}}
       {{directory_check_results}}
+  when: "'Exits' in directory_check_results"
+  ignore_errors: yes
+
+
+- name: Check
+  debug:
+    msg: >
+      {{'양호: 가상디렉터리가 존재하지 않습니다.'}}
+      IIS Version : {{iis_version.stdout}}
+      {{directory_check_results}}
+  when: "'Exits' not in directory_check_results"
+  ignore_errors: yes

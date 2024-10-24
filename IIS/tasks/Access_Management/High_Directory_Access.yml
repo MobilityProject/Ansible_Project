@@ -9,10 +9,15 @@
   register: enable_parent_paths_value
 
 - name: Output current enableParentPaths value
+  fail:
+    msg: >
+      {{'취약: 상위 디렉터리 접근 금지 설정이 되어 있지 않습니다.' enable_parent_paths_value.stdout }}"
+  when: enable_parent_paths_value.stdout != 'false'
+  ignore_errors: yes
+
+- name: Output current enableParentPaths value
   debug:
     msg: >
-      {{ '양호: 상위 디렉터리 접근 금지 설정이 되어 있습니다.' if (enable_parent_paths_value.stdout == 'false') else 
-      '취약: 상위 디렉터리 접근 금지 설정이 되어 있지 않습니다.' enable_parent_paths_value.stdout }}"
-
-
+      {{'양호: 상위 디렉터리 접근 금지 설정이 되어 있습니다.' enable_parent_paths_value.stdout}}
+  when: enable_parent_paths_value.stdout == 'false'
 

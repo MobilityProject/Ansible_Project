@@ -16,7 +16,8 @@
   - name: Generate SSH key
     become_user: "semaphore"
     command: >
-      ssh-keygen -t rsa -b 4096 -f /home/semaphore/.ssh/id_rsa -N "{{ '' }}" {{ '-y' if ssh_key.stat.exists else '' }}
+      ssh-keygen -t rsa -b 4096 -f /home/semaphore/.ssh/id_rsa -N "{{ '' }}"
+    when: not ssh_key.stat.exists
     register: ssh_keygen_result
     ignore_errors: yes
 

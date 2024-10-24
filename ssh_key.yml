@@ -17,7 +17,7 @@
     become_user: "semaphore"
     command: >
       ssh-keygen -t rsa -b 4096 -f /home/semaphore/.ssh/id_rsa -N "{{ '' }}"
-    when: not ssh_key
+    when: "'id_rsa' not in ssh_key"
     ignore_errors: yes
 
   - name: ssh key check

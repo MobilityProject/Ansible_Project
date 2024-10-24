@@ -6,13 +6,14 @@
 
 - name: debug message if document is exists
   fail:
-    msg: "DocumentRoot가 기본값인 /var/www/html로 설정되어 있습니다(취약)"
+    msg: "취약:  default DucumentRoot 경로가 /var/www/html로 설정되어 있습니다. /etc/httpd/conf/httpd.conf에서 DocumentRoot를 별도의 경로로 변경해주세요."
   when: document_list != ""
   ignore_errors: yes
 
 - name: debug message if document is not exists
   debug:
-    msg: "DocumentRoot가 기본값이 아닙니다. (양호)"
+    msg: "양호: DocumentRoot가 default Document를 사용하고 있지 않습니다."
+  when: document_list.stdout == ""
 
 
 - name: return true if configure file is exists
@@ -29,10 +30,11 @@
 
 - name: debug message if symlink is exists
   fail:
-    msg: "symlink가 발견되었습니다 (취약)"
+    msg: "취약: 심볼릭 링크 사용이 제한되어 있지 않습니다. /etc/httpd/conf/httpd.conf를 확인하세요."
   when: link_list.stdout != ""
   ignore_errors: yes
 
 - name: debug message if symlink is not exists
   debug:
-    msg: "symlink가 발견되지 않았습니다 (양호)"
+    msg: "양호 : 심볼릭 링크 사용이 제한되어 있습니다."
+  when: link_list.stdout == ""

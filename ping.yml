@@ -4,5 +4,5 @@
   tasks:
 
   - name: ping 때리기
-    become_user: semaphore
     ping:
+    ignored_errors: yes

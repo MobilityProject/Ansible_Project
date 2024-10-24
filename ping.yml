@@ -1,4 +1,7 @@
 ---
-- name: ping 때리기
-  ping:
+- name: 모든 호스트에 대해 Ping 확인
+  hosts: all
+  tasks:
 
+  - name: ping 때리기
+    ping:

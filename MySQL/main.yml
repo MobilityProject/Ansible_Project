@@ -1,41 +1,47 @@
 ---
 # tasks file for linux-server
 
-- name: debug print
+- block:
+  - name: Inspect Account
+    import_tasks: /MySQL/mysql_account.yml
+
+  - name: Inspect Password
+    import_tasks: /MySQL/mysql_password.yml
+
+  - name: Inspect Password_Sol
+    import_tasks: /MySQL/mysql_password_sol.yml
+
+  - name: Inspect Priv
+    import_tasks: /MySQL/mysql_priv.yml
+
+  - name: Inspect root_Priv
+    import_tasks: /MySQL/mysql_rootpriv.yml
+
+  - name: Inspect root_Priv_Sol
+    import_tasks: /MySQL/mysql_rootpriv_sol.yml
+
+  - name: Inspect Conf_Priv
+    import_tasks: /MySQL/mysql_confpriv.yml
+
+  - name: Inspect Password_Escrpyt_Alg
+    import_tasks: /MySQL/mysql_passwd_escrypt.yml
+
+  - name: Inspect Log
+    import_tasks: /MySQL/mysql_log.yml
+
+  - name: Inspect Log_Sol
+    import_tasks: /MySQL/mysql_log_sol.yml
+
+  - name: Inspect Ver_Check
+    import_tasks: /MySQL/mysql_ver_check.yml
+  when: "'mysql' in services"
+
+- name: Skipping Mysql scan Logic 
   debug:
-    msg: "test"
+    msg: "MYSQL 서비스가 발견되지 않아 해당 시스템에서 MYSQL 점검을 수행하지 않습니다."
+  when: "'mysql' not in services"
 
-- name: Inspect Account
-  import_tasks: /MySQL/mysql_account.yml
-
-- name: Inspect Password
-  import_tasks: /MySQL/mysql_password.yml
-
-- name: Inspect Password_Sol
-  import_tasks: /MySQL/mysql_password_sol.yml
-
-- name: Inspect Priv
-  import_tasks: /MySQL/mysql_priv.yml
-
-- name: Inspect root_Priv
-  import_tasks: /MySQL/mysql_rootpriv.yml
-
-- name: Inspect root_Priv_Sol
-  import_tasks: /MySQL/mysql_rootpriv_sol.yml
-
-- name: Inspect Conf_Priv
-  import_tasks: /MySQL/mysql_confpriv.yml
-
-- name: Inspect Password_Escrpyt_Alg
-  import_tasks: /MySQL/mysql_passwd_escrypt.yml
-
-- name: Inspect Log
-  import_tasks: /MySQL/mysql_log.yml
-
-- name: Inspect Log_Sol
-  import_tasks: /MySQL/mysql_log_sol.yml
-
-- name: Inspect Ver_Check
-  import_tasks: /MySQL/mysql_ver_check.yml
-
-
+- name: Mysql Service Inspection is Done
+  debug:
+    msg: "MYSQL 취약점 점검과 조치가 수행되었습니다."
+  when: "'mysql' in services"

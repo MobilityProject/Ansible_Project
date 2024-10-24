@@ -27,7 +27,7 @@
 
   - name: ssh key deploy
     become: yes
-    shell: sshpass -p "{{password}}" ssh-copy-id -i /home/semaphore/.ssh/id_rsa.pub {{ item }}
+    shell: sshpass -p {{ password }} ssh-copy-id -i /home/semaphore/.ssh/id_rsa.pub {{ item }}
     loop: "{{user}}"
     register: result
     ignore_errors: yes

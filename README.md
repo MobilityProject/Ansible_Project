@@ -11,4 +11,4 @@ Ansible을 이용한 클라우드 취약점 분석
 ![image](https://github.com/user-attachments/assets/8dda8c12-df6b-40d2-af38-b31cd8dd2a07)
 
 < 사용 기술 스택 >
-<img src="https://img.shields.io/badge/Grafana-yellow?style=for-the-badge&logo=기술스택아이콘&logoColor=white">
+<img src="https://img.shields.io/badge/Grafana-yellow?style=for-the-badge&logo=#F46800&logoColor=white">

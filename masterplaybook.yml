@@ -15,6 +15,9 @@
     #- role: Redis
     # Include the role for Apache server management
     - role: Apache
-  
+    # Include the role for IIS server management
+    #- role: IIS
+    # Include the role for Apache server management
+    #- roles: windows
   #tasks:
    # - name: 

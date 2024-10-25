@@ -1,11 +1,11 @@
-![image](https://github.com/user-attachments/assets/7a8778a4-63e2-4b4d-8600-1300b0bdac98)Ansible을 이용한 클라우드 취약점 분석 
+![image](https://github.com/user-attachments/assets/05c7adac-dad8-459f-862f-ebedddd0ddef)![image](https://github.com/user-attachments/assets/7a8778a4-63e2-4b4d-8600-1300b0bdac98)Ansible을 이용한 클라우드 취약점 분석 
 
 ![시스템 구성도 drawio](https://github.com/user-attachments/assets/b7512b0e-1e45-40f3-9dae-61f93f80934b)
 
 ![상세 구성도 drawio](https://github.com/user-attachments/assets/658cabcc-9577-4bb6-9fa8-1ae2b3915b26)
 
 
-![image](https://github.com/user-attachments/assets/8d888a67-2a64-4ae8-94da-ecbd977ed75c)
+![image](https://github.com/user-attachments/assets/b5b8cc07-8929-407b-8b8a-d8bd579ee1f3)
 ![image](https://github.com/user-attachments/assets/d2867b09-b3d0-4751-a2bb-3a4ee9a074bd)
 ![image](https://github.com/user-attachments/assets/8857ce2f-60d8-498f-aacf-804eef52fd98)
 ![image](https://github.com/user-attachments/assets/464c2322-1c13-4795-9259-84421a24d891)

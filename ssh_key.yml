@@ -28,7 +28,7 @@
     
   - name: Check if SSH key is already deployed
     shell: sshpass -p {{ item.0 }} ssh -o StrictHostKeyChecking=no {{ item.1 }} 'grep -q "$(cat /home/semaphore/.ssh/id_rsa.pub)" ~/.ssh/authorized_keys'
-    with_items: 
+    with_nested: 
       - "{{ password }}"
       - "{{ user }}"
     register: key_check_result
@@ -36,7 +36,7 @@
     
   - name: ssh key deploy
     shell: sshpass -p {{item.0}} ssh-copy-id -i /home/semaphore/.ssh/id_rsa.pub {{ item.1 }}
-    with_items: 
+    with_nested: 
       - "{{password}}"
       - "{{user}}"
     when: key_check_result.results[item.index].rc != 0

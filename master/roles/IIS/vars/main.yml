@@ -1,3 +1,0 @@
----
-# vars file for IIS
-application_host_config: "C:\\Windows\\System32\\inetsrv\\config\\applicationHost.config"

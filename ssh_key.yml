@@ -39,7 +39,7 @@
     with_nested: 
       - "{{password}}"
       - "{{user}}"
-    when: key_check_result.results[item.index].rc != 0
+    when: item[0].rc != 0
     register: result
     ignore_errors: yes
 

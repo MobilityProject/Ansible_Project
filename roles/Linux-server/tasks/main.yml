@@ -14,6 +14,12 @@
   when: ansible_os_family == "RedHat"
 
 - block:
+  
+  - name: Include FileList
+    include_vars: ../vars/file_check_list.yml
+  - name: Include Vunerability Services List
+    include_vars: ../vars/vulnerablity_rtype_services.yml
+
   - name: Remote access restrictions
     import_tasks: ./Account_Managment/server_account.yml
   

@@ -4,7 +4,7 @@
   - name: World Writable 파일 검색
     command: find / -xdev -type f -perm -2
     register: world_writable_list
-    async: 10 # 10초 이상 경과할 경우 실행하지 않음
+    async: 30 # 10초 이상 경과할 경우 실행하지 않음
     poll: 0
     ignore_errors: yes
     changed_when: false

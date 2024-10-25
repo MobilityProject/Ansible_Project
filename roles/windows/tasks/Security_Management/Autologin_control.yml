@@ -15,12 +15,14 @@
     }
   register: auto_admin_logon_output
 
-# 2. 레지스트리 값 디버그 출력
-- name: Debug output for AutoAdminLogon
-  debug:
-    msg: "{{ auto_admin_logon_output.stdout }}"
+# 3. AutoAdminLogon 값이 1일 때 취약 메시지 출력 (프로그램이 멈추지 않도록 설정)
+- name: Fail if AutoAdminLogon is set to '1'
+  fail:
+    msg: "취약: AutoAdminLogon 값이 1로 설정되어 있습니다. AutoLogin 기능을 비활성화합니다."
+  when: "'AutoAdminLogon value is: 1' in auto_admin_logon_output.stdout"
+  ignore_errors: yes
 
-# 3. PowerShell을 사용하여 AutoAdminLogon 값이 1이면 0으로 변경
+# 4. PowerShell을 사용하여 AutoAdminLogon 값이 1이면 0으로 변경
 - name: Set AutoAdminLogon to 0 if it is currently set to 1
   win_shell: |
     $key = "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon"
@@ -32,9 +34,10 @@
         Write-Host "No change needed."
     }
   when: "'AutoAdminLogon value is: 1' in auto_admin_logon_output.stdout"
+  register: action_state
 
-# 4. PowerShell을 사용하여 AutoAdminLogon 레지스트리 값을 확인
-- name: Check if AutoAdminLogon exists and its value using PowerShell
+# 5. PowerShell을 사용하여 AutoAdminLogon 레지스트리 값을 다시 확인
+- name: Check if AutoAdminLogon exists and its value after action
   win_shell: |
     $key = "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon"
     if (Test-Path $key) {
@@ -49,8 +52,14 @@
     }
   register: auto_admin_logon_outputs
 
-# 5. 레지스트리 값 디버그 출력
-- name: Debug output for AutoAdminLogon
+# 6. 레지스트리 값이 0으로 변경되었을 때 조치 완료 메시지 출력
+- name: Display Debug action Complete Message for AutoAdminLogon
   debug:
-    msg: "{{ auto_admin_logon_outputs.stdout }}"
+    msg: "조치완료: AutoLogin 기능이 비활성화되었습니다."
+  when: action_state is changed and auto_admin_logon_outputs.stdout | int == 0
 
+# 7. AutoAdminLogon 값이 이미 0일 때 양호 메시지 출력
+- name: Output Message System Check Results Good
+  debug:
+    msg: "양호: AutoLogin 기능이 비활성화 상태입니다."
+  when: "'AutoAdminLogon value is: 0' in auto_admin_logon_output.stdout and action_state is not changed"

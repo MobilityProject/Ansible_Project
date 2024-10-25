@@ -7,6 +7,6 @@ Ansible을 이용한 클라우드 취약점 분석
 
 ![image](https://github.com/user-attachments/assets/b5b8cc07-8929-407b-8b8a-d8bd579ee1f3)
 ![image](https://github.com/user-attachments/assets/d2867b09-b3d0-4751-a2bb-3a4ee9a074bd)
-![image](https://github.com/user-attachments/assets/2b096c65-0650-4dbc-8c23-56d3267f4205)
+![제목 없음](https://github.com/user-attachments/assets/fa75f656-c0a3-41ec-ba20-57282816adbd)
 ![image](https://github.com/user-attachments/assets/464c2322-1c13-4795-9259-84421a24d891)
 ![image](https://github.com/user-attachments/assets/2c698977-ceb4-4184-a2b9-ddbe33f0d181)

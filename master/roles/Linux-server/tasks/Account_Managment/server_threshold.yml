@@ -1,0 +1,35 @@
+---
+  - name: 계정 라인이 존재하고 주석 처리가 되어 있지 않은지 확인
+    command: "grep -P '^\\s*account\\s+required\\s+pam_faillock\\.so\\s+preauth\\s+silent\\s+audit\\s+deny=5' /etc/pam.d/system-auth"
+    register: pam_check
+    ignore_errors: yes
+  
+  - name: 점검 결과
+    fail:
+      msg: "취약: 'account required pam_faillock.so preauth silent audit deny=5'가 누락되었거나 주석 처리되었습니다."
+    when: pam_check.rc != 0
+    ignore_errors: yes
+  
+  - name: deny 설정을 확인
+    shell: "grep -Po 'deny=\\d+' /etc/pam.d/system-auth | head -1"
+    register: deny_check
+    ignore_errors: yes
+  
+  - name: 5회 이하 설정일 경우 양호 메시지 출력
+    debug:
+      msg: "양호: 'deny' 설정이 5회 이하로 설정되어 있습니다."
+    when: deny_check.stdout | regex_search('deny=(\\d+)') and (deny_check.stdout | regex_search('deny=(\\d+)') | int) <= 5
+    ignore_errors: yes
+  
+  - name: 조치 진행
+    blockinfile:
+      path: "{{ item }}"
+      insertafter: "^\\s*account"
+      block: |
+        account required pam_faillock.so preauth silent audit deny=5 unlock_time=600
+    with_items:
+      - /etc/pam.d/system-auth
+      - /etc/pam.d/password-auth
+    when: pam_check.rc != 0
+    ignore_errors: yes
+  

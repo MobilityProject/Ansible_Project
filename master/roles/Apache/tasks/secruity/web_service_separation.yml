@@ -1,0 +1,38 @@
+---
+- name: web_service_separation
+  command: grep -P 'DocumentRoot\s+"\/var\/www\/html"' /etc/httpd/conf/httpd.conf
+  register: document_list
+  changed_when: false
+
+- name: debug message if document is exists
+  fail:
+    msg: "DocumentRoot가 기본값인 /var/www/html로 설정되어 있습니다(취약)"
+  when: document_list != ""
+  ignore_errors: yes
+
+- name: debug message if document is not exists
+  debug:
+    msg: "DocumentRoot가 기본값이 아닙니다. (양호)"
+
+
+- name: return true if configure file is exists
+  stat: 
+    path: /etc/httpd/conf/httpd.conf
+  register: configure_state
+
+
+- name: return true if symboliclink option is exists
+  command: grep FollowSymLinks /etc/httpd/conf/httpd.conf
+  register: link_list
+  changed_when: false
+  when: configure_state.stat.exists
+
+- name: debug message if symlink is exists
+  fail:
+    msg: "symlink가 발견되었습니다 (취약)"
+  when: link_list.stdout != ""
+  ignore_errors: yes
+
+- name: debug message if symlink is not exists
+  debug:
+    msg: "symlink가 발견되지 않았습니다 (양호)"

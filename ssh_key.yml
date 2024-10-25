@@ -47,6 +47,5 @@
     debug:
       msg: >
           private_key: {{ private_key}}
-          {{result}}
           "complete"
   

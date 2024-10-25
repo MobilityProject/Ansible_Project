@@ -1,19 +1,20 @@
 ---
-  
+
   - name: Sendmail 프로세스 확인
     shell: "ps -ef | grep sendmail | grep -v grep"
     register: sendmail_process
     ignore_errors: yes
-  
+
   - name: Sendmail 프로세스 결과 표기
     debug:
       msg: "{{ sendmail_process.stdout if sendmail_process.stdout else 'Sendmail 프로세스가 실행 중이지 않습니다.' }}"
-  
+    ignore_errors: yes
+
   - name: /etc/mail/sendmail.cf 파일에서 DZ 값 확인
     shell: "cat /etc/mail/sendmail.cf | grep DZ"
     register: sendmail_dz
     ignore_errors: yes
-  
+
   - name: Sendmail DZ 버전 검사
     debug:
       msg: >
@@ -27,34 +28,36 @@
             "양호: Sendmail 버전이 {{ dz_version }}로 보안 요구 사항을 충족합니다."
           {% endif %}
         {% endif %}
-  
-  
+    ignore_errors: yes
+
+
   - name: Sendmail 상태 및 버전 결과 출력
     debug:
       msg: |
         Sendmail 프로세스 결과:
         DZ 값 확인 결과: {{ sendmail_dz.stdout if sendmail_dz.stdout else 'N/A' }}
-  
+
         DZ 버전 검사 결과: {{ dz_version_status }}
-  
-  
-  
-  
+    ignore_errors: yes
+
+
+
   - name: Sendmail 프로세스 확인
     shell: "ps -ef | grep sendmail | grep -v grep"
     register: sendmail_process
     ignore_errors: yes
-  
+
   - name: Sendmail 프로세스 결과 표기
     debug:
       msg: "{{ sendmail_process.stdout if sendmail_process.stdout else 'Sendmail 프로세스가 실행 중이지 않습니다.' }}"
-  
+    ignore_errors: yes
+
   - name: R$* 라인 확인
     shell: "grep -E 'R\\$\\*.*Relaying denied' /etc/mail/sendmail.cf"
     register: grep_result
     ignore_errors: yes
-  
-  
+
+
   - name: 주석 여부 검사
     set_fact:
       line_status: >
@@ -65,8 +68,9 @@
         {% else %}
           "양호: R$* 설정이 활성화되어 있습니다."
         {% endif %}
-  
-  
+      ignore_errors: yes
+
+
   - name: 검사 결과 출력
     debug:
       msg: >
@@ -74,25 +78,28 @@
         {% if line_status.startswith('양호') %}
           R$* 라인 검사 결과: {{ grep_result.stdout | trim }}
         {% endif %}
-  
-  
-  
-  
+    ignore_errors: yes
+
+
+
+
   - name: PrivacyOptions에서 restrictqrun 확인
     command: grep "PrivacyOptions" /etc/mail/sendmail.cf
     register: privacy_options_output
     ignore_errors: yes
-  
+
   - name: restrictqrun 확인 _1
     fail:
       msg: "취약: restrictqrun이 PrivacyOptions에 존재하지 않습니다."
     when: "'restrictqrun' not in privacy_options_output.stdout"
-  
+    ignore_errors: yes
+
   - name: restrictqrun 확인 _2
     debug:
       msg: "양호: restrictqrun이 PrivacyOptions에 존재합니다."
     when: "'restrictqrun' in privacy_options_output.stdout"
-  
+    ignore_errors: yes
+
   - name: restrictqrun이 없으면 PrivacyOptions에 추가
     lineinfile:
       path: /etc/mail/sendmail.cf

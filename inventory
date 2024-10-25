@@ -1,24 +1,25 @@
-# hosts.ini
+#hosts.ini
 
 [linux]
-10.0.2.15
+10.0.2.6
 
-[windows]
-10.0.2.15
+[win]
+10.0.2.8
 
 [mysql]
-10.0.2.15
+10.0.2.6
 
 [redis]
-10.0.2.15
+10.0.2.6
 
 [apache]
-10.0.2.15
+10.0.2.6
 
-[windows:vars]
-ansible_user=ubuntu
+[win:vars]
+ansible_user=user
 ansible_password='0909'
 ansible_connection=winrm
 ansible_winrm_transport=basic
 ansible_port=5985
 ansible_winrm_server_cert_validation=ignore
+ansible_ssh_private_key_file=~/.ssh/id_rsa

@@ -42,6 +42,7 @@
   - name: Inspect Ver_Check
     import_tasks: ./Patch_Log_Management/mysql_ver_check.yml
   when: mysql_installed is defined
+  become: yes
 
 - name: Skipping Mysql scan Logic 
   debug:

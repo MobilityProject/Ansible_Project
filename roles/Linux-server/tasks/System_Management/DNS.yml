@@ -20,6 +20,7 @@
         {% else %}
           양호: DNS 서비스의 Zone Transfer가 제한되어 있습니다.
         {% endif %}
+    ignore_errors: yes
   
   - name: DNS Zone Transfer 수정
     lineinfile:

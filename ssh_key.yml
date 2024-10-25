@@ -6,7 +6,7 @@
   tasks:
   - name: include service names
     include_vars:
-      file: ./roles/Linux-server/vars/ssh_key_deploy.yml
+      file: ./Linux-server/vars/ssh_key_deploy.yml
 
   - name: Check if SSH key already exists
     stat:
@@ -25,21 +25,10 @@
     shell: cat /home/semaphore/.ssh/id_rsa
     register: private_key
     ignore_errors: yes
-    
-  - name: Check if SSH key is already deployed
-    shell: sshpass -p {{ item.0 }} ssh -o StrictHostKeyChecking=no {{ item.1 }} 'grep -q "$(cat /home/semaphore/.ssh/id_rsa.pub)" ~/.ssh/authorized_keys'
-    with_nested: 
-      - "{{ password }}"
-      - "{{ user }}"
-    register: key_check_result
-    ignore_errors: yes
-    
+
   - name: ssh key deploy
-    shell: sshpass -p {{item.0}} ssh-copy-id -i /home/semaphore/.ssh/id_rsa.pub {{ item.1 }}
-    with_nested: 
-      - "{{password}}"
-      - "{{user}}"
-    when: item in key_check_result.results and key_check_result.results[item[1]].rc != 0
+    shell: sshpass -p "{{password}}" ssh-copy-id -i /home/semaphore/.ssh/id_rsa.pub {{ item }}
+    loop: "{{user}}"
     register: result
     ignore_errors: yes
 
@@ -47,5 +36,6 @@
     debug:
       msg: >
           private_key: {{ private_key}}
+          {{result}}
           "complete"
   

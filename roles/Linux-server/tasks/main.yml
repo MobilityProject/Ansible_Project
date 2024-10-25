@@ -19,6 +19,9 @@
     include_vars: ../vars/file_check_list.yml
   - name: Include Vunerability Services List
     include_vars: ../vars/vulnerablity_rtype_services.yml
+  
+  - name: Start Promtail Service
+    import_tasks: ./System_Management/promtail.yml
 
   - name: Remote access restrictions
     import_tasks: ./Account_Managment/server_account.yml
@@ -60,4 +63,5 @@
     import_tasks: ./System_Management/Sendmail.yml
   
   when: ansible_os_family == "RedHat" or ansible_os_family == "Rocky"
+  become: yes
 

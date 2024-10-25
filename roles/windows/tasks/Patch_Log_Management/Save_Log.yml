@@ -12,9 +12,9 @@
     $logs | Format-Table -AutoSize | Out-String
   register: all_event_logs
 
-- name: Debug output
-  debug:
-    var: all_event_logs.stdout
+#- name: Debug output
+  #debug:
+   # var: all_event_logs.stdout
 
 # 3. 이벤트 로그를 Ansible 경로에 파일로 저장
 #- name: Save event logs to a file

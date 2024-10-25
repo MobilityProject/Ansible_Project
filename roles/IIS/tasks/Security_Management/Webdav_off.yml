@@ -26,7 +26,7 @@
     $currentValue = "{{ webdav_reg_value.stdout }}"
     if ($currentValue -ne 1) {
         Set-ItemProperty -Path $regPath -Name $regName -Value 1
-        Write-Output "DisableWebDAV value set to 1"
+        Write-Output "DisableWebDAV value set to {{webdav_reg_value.stdout}}"
     } else {
         Write-Output "DisableWebDAV value is already 1"
     }

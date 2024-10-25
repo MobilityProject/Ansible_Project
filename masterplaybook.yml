@@ -1,23 +1,27 @@
 - name: Master Playbook for System Management
-  hosts: linux
-  become: yes
+  hosts: all
+  #become: yes
   gather_facts: yes
 
 
   roles:
     # Include the role for Redis server management
     - role: Redis
+      when: "'redis' in group_names"
     # Include the role for Linux server management
     - role: Linux-server
+      when: "'linux' in group_names"
     # Include the role for MySQL server management
     - role: MySQL
-    # Include the role for Redis server management
-    #- role: Redis
+      when: "'mysql' in group_names"
     # Include the role for Apache server management
     - role: Apache
+      when: "'Apache' in group_names"
     # Include the role for IIS server management
-    #- role: IIS
+    - role: IIS
+      when: "'win' in group_names"
     # Include the role for Apache server management
-    #- roles: Windows
+    - role: windows
+      when: "'win' in group_names"
   #tasks:
    # - name: 

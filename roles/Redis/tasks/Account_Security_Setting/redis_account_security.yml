@@ -60,9 +60,12 @@
       - bind_ip_check.stdout is search('^bind\s+(127\.0\.0\.1|(' + allow_list | join('|') + '))')
     ignore_errors: yes
 
+
+
+
   # Slave 읽기 전용 모드 설정
   - name: replica-read-only가 yes로 설정되어 있는지 확인
-    command: grep -i '^\s*replica-read-only\s*yes' /etc/redis/redis.conf
+    command: grep -i '^\s*#\s*replica-read-only|^\s*replica-read-only\s+yes\s*$' /etc/redis/redis.conf
     register: replica_read_only_check
     ignore_errors: yes
     changed_when: false
@@ -80,12 +83,16 @@
       msg: "{{ replica_read_only_msg }}"
     when: true  # 항상 실행
 
-  - name: replica-read-only를 yes로 변경
+  - name: replica-read-only 앞에 주석이 있는 경우 yes로 변경
     lineinfile:
       path: /etc/redis/redis.conf
-      regexp: '^\s*replica-read-only\s*no'
+      regexp: '^\s*#\s*replica-read-only'
       line: 'replica-read-only yes'
     when: replica_read_only_check.rc != 0  # no인 경우
+
+
+
+
 
   # rename-command 설정
   - name: redis.conf에서 rename-command CONFIG가 주석 처리되어 있는지 확인

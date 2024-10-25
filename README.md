@@ -10,9 +10,14 @@ Ansible을 이용한 클라우드 취약점 분석
 ![image](https://github.com/user-attachments/assets/51c7af4d-0777-4ac0-9ac6-145180a7ba2e)
 ![image](https://github.com/user-attachments/assets/8dda8c12-df6b-40d2-af38-b31cd8dd2a07)
 
-< 사용 기술 스택 >
-
 <div align=center> 
+ < 사용 기술 스택 >
+</div>
+  
+<div align=center> 
+ <img src="https://img.shields.io/badge/Ansible-black?style=for-the-badge&logo=ansible&logoColor=black">
+ <br>
+ 
  <img src="https://img.shields.io/badge/grafana-yellow?style=for-the-badge&logo=grafana&logoColor=black">
  <img src="https://img.shields.io/badge/linux-FCC624?style=for-the-badge&logo=linux&logoColor=black">
  <img src="https://img.shields.io/badge/mysql-4479A1?style=for-the-badge&logo=mysql&logoColor=white">

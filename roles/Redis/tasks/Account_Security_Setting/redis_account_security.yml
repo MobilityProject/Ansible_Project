@@ -38,6 +38,8 @@
       msg: "취약: 'bind' 설정에 deny_list 내 IP가 포함되어 있습니다. /etc/redis/redis.conf를 확인하세요."
     when: 
       - bind_ip_check.stdout is search(deny_list | join('|'))
+    ignore_errors: yes
+
 
   # 127.0.0.1만 존재할 경우 allow_list 추가
   - name: 127.0.0.1만 존재할 경우 allow_list 추가
@@ -48,6 +50,7 @@
       insertafter: '^#.*bind'
     when: 
       - bind_ip_check.stdout is search('^bind\s+127\.0\.0\.1\s*$')
+    ignore_errors: yes
 
   # 127.0.0.1과 allow_list의 IP가 존재할 경우 성공 메시지 출력
   - name: 127.0.0.1과 allow_list 내 IP가 존재할 경우 성공
@@ -55,8 +58,7 @@
       msg: "양호 : 'bind' 설정이 올바르게 되어 있습니다."
     when: 
       - bind_ip_check.stdout is search('^bind\s+(127\.0\.0\.1|(' + allow_list | join('|') + '))')
-
-
+    ignore_errors: yes
 
   # Slave 읽기 전용 모드 설정
   - name: replica-read-only가 yes로 설정되어 있는지 확인

@@ -7,19 +7,35 @@
 
 - name: 서비스 정보 수집 (Linux)
   service_facts:
-  when: ansible_os_family == "RedHat"
+  when: ansible_os_family == "RedHat" or ansible_os_family == "Rocky"
 
-- name: 서비스 정보 출력 (Redis만)
+- name: Check if redis.conf exists
+  stat:
+    path: /etc/redis/redis.conf  # redis.conf의 경로를 수정하세요
+  register: redis_conf
+
+- name: Print message if redis.conf exists
   debug:
-    msg: "{{ services['redis'] if 'redis' in services else 'Redis 서비스가 없습니다.' }}"
-  when: 
-    - ansible_os_family == "RedHat"
+    msg: "redis.conf 파일이 존재합니다."
+  when: redis_conf.stat.exists
+  ignore_errors: yes
+
+- name: Print message if redis.conf does not exist
+  debug:
+    msg: "redis.conf 파일이 존재하지 않습니다."
+  when: not redis_conf.stat.exists
+  ignore_errors: yes
 
 - block:
+    - name: Include allow_list
+      include_vars: ../vars/allow_list.yml
+    - name: Include deny_list
+      include_vars: ../vars/deny_list.yml
     - name: 보안 설정 및 권한 관리
       import_tasks: ./Account_Security_Setting/redis_account_security.yml
     - name: 로그 활성화
       import_tasks: ./Patch_Log_Management/redis_Log.yml
-  when: 
-    - ansible_os_family == "RedHat"
-
+  when:
+    - ansible_os_family == "RedHat" or ansible_os_family == "Rocky"
+    - redis_conf.stat.exists
+~

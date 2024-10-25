@@ -6,7 +6,7 @@
   tasks:
   - name: include service names
     include_vars:
-      file: ./Linux-server/vars/ssh_key_deploy.yml
+      file: ./roles/Linux-server/vars/ssh_key_deploy.yml
 
   - name: Check if SSH key already exists
     stat:

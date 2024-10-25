@@ -14,3 +14,11 @@
 
 [apache]
 10.0.2.15
+
+[windows:vars]
+ansible_user=ubuntu
+ansible_password='0909'
+ansible_connection=winrm
+ansible_winrm_transport=basic
+ansible_port=5985
+ansible_winrm_server_cert_validation=ignore

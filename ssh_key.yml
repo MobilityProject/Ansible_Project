@@ -27,8 +27,10 @@
     ignore_errors: yes
 
   - name: ssh key deploy
-    shell: sshpass -p "{{password}}" ssh-copy-id -i /home/semaphore/.ssh/id_rsa.pub {{ item }}
-    loop: "{{user}}"
+    shell: sshpass -p {{item.0}} ssh-copy-id -i /home/semaphore/.ssh/id_rsa.pub {{ item.1 }}
+    with_items: 
+      - "{{password}}"
+      - "{{user}}"
     register: result
     ignore_errors: yes
 

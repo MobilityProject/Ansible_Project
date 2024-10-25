@@ -1,4 +1,7 @@
 ---
+
+#원격 시스템에서 강제로 시스템 종료
+
 # 1. secedit 명령어를 사용하여 cfg 파일로 보안 설정을 export
 - name: Export security settings to cfg file
   win_command: secedit /export /cfg c:\cfg.txt
@@ -16,11 +19,31 @@
   win_shell: |
     (Get-Content c:\cfg.txt) -match 'SeRemoteShutdownPrivilege'
   register: privilege_check
-# 4. privilege 권한 출력   
+
+# 4. 취약할 때 fail 메시지 출력 및 취약 상태 알림
+- name: Fail if there are extra users with SeRemoteShutdownPrivilege
+  fail:
+    msg: "취약: 원격 시스템 종료 권한을 가진 계정이 존재합니다. 제거를 진행합니다."
+  when: "'S-1-5-32-544' not in privilege_check.stdout"
+  ignore_errors: yes
+
+# 5. privilege 권한 출력 및 수정
 - name: Remove extra users from SeRemoteShutdownPrivilege if not only Administrators
   win_lineinfile:
     path: c:\cfg.txt
     regexp: '^SeRemoteShutdownPrivilege = .+'
     line: 'SeRemoteShutdownPrivilege = *S-1-5-32-544'
   when: "'S-1-5-32-544' not in privilege_check.stdout"
+  register: remove_extra_user_result
 
+# 6. 조치 완료 메시지 출력
+- name: Display action Completed Message
+  debug:
+    msg: "조치 완료: 원격 시스템 종료 권한을 가진 계정이 제거되었습니다."
+  when: remove_extra_user_result is changed
+
+# 7. 양호 메시지 출력
+- name: Display Message that you do not have an account with remote shutdown privileges
+  debug:
+    msg: "양호: 원격 시스템 종료 권한을 가진 계정이 존재하지 않습니다."
+  when: remove_extra_user_result is not changed

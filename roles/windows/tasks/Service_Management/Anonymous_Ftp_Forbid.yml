@@ -25,10 +25,10 @@
     msg: >
       {% if ftp_auth_status.results %}
         {% for result in ftp_auth_status.results %}
+          취약: FTP 익명 연결이 활성화되어 있습니다.
           Site: {{ ftp_sites.stdout_lines[loop.index0] }} - 
           Status: {{ result.stdout | default('Not Configured') }}
         {% endfor %}
       {% else %}
-        No FTP sites found.
+        양호: FTP 익명 연결 허용이 비활성화되어 있습니다.
       {% endif %}
-

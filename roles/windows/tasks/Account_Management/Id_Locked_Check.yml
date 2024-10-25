@@ -1,25 +1,36 @@
----
 # 1. net accounts 명령을 실행하여 계정 잠금 임계값 확인
 - name: Check account lockout threshold using net accounts
   win_shell: |
     net accounts
   register: account_lockout_output
-
-# 2. 현재 잠금 임계값 디버그 메시지 출력
-- name: Display current lockout threshold
-  debug:
-    msg: "{{ account_lockout_output.stdout_lines }}"
   
-# 3. 잠금 임계값이 never 혹은 5 초과일 경우 5로 설정
+# 2. Lockout threshold 값 추출 및 변수 저장
+- name: Parse and save lockout threshold value
+  set_fact:
+    lockout_threshold_value: "{{ account_lockout_output.stdout_lines | select('search', 'Lockout threshold') | map('regex_search', '[0-9]+') | list | first }}"
+
+# 3. 계정 잠금 임계값이 5 이하일 때 양호 메시지 출력
+- name: Display message if lockout threshold is 5 or less
+  debug:
+    msg: "양호: 계정 잠금 임계값이 5 이하로 설정되어 있습니다."
+  when: "lockout_threshold_value | int <= 5"
+
+# 4. 계정 잠금 임계값이 Never이거나 5를 초과할 때 취약 메시지 출력
+- name: Fail if lockout threshold is Never or more than 5
+  fail:
+    msg: "취약: 계정 잠금 임계값이 설정되지 않았거나 5를 초과합니다. 임계값을 5로 설정하는 작업을 진행합니다."
+  when: "lockout_threshold_value | int > 5"
+  ignore_errors: yes
+
+# 5. 계정 잠금 임계값을 5로 설정
 - name: Set lockout threshold to 5 if it is never or more than 5
   win_shell: |
     net accounts /lockoutthreshold:5
-  when: "'Lockout threshold' in account_lockout_output.stdout and ('Never' in account_lockout_output.stdout or (account_lockout_output.stdout | regex_search('Lockout threshold *: *([0-9]+)') | int > 5))"
+  when: "lockout_threshold_value | int > 5"
   register: lockout_threshold_change
 
-# 4. 변경 후 디버그 메시지 출력
+# 6. 잠금 임계값 변경 후 조치 완료 메시지 출력
 - name: Display lockout threshold change message
   debug:
-    msg: "Lockout threshold was set to 5."
+    msg: "조치 완료: 계정 잠금 임계값이 {{Locked_Limit}}로 설정되었습니다."
   when: lockout_threshold_change.changed
-

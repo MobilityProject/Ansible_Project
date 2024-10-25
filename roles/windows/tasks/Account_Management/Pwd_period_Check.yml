@@ -1,20 +1,39 @@
 ---
+#암호 기간 사용 없음 제거
 - name: Fetch all active users and check password expiration
   win_command: |
     wmic useraccount where "Disabled=FALSE" get Name, PasswordExpires
   register: active_users
 
-- name: Display active users and their password expiration status
+# 2. 양호한 경우 암호 만료가 설정된 사용자 디버그 메시지 출력 (양호한 경우 더 이상의 작업 없음)
+- name: Display users with password expiration set (양호한 경우)
   debug:
-    var: active_users.stdout_lines
+    msg: "양호: 모든 활성 사용자가 암호 만료 설정이 되어 있습니다."
+  when: active_users.stdout_lines | select('search', 'FALSE') | length == 0
 
+# 3. 취약한 경우 암호 만료가 설정되지 않은 사용자 출력
+- name: Warn users without password expiration (취약한 경우)
+  fail:
+    msg: "취약: 다음 사용자들은 암호 만료가 설정되지 않았습니다. 암호 만료를 설정하는 작업을 진행합니다: {{ active_users.stdout_lines | select('search', 'FALSE') }}"
+  when: active_users.stdout_lines | select('search', 'FALSE') | length > 0
+  ignore_errors: yes
+
+
+# 4. 암호 만료가 설정되지 않은 사용자에 대해 암호 만료 설정
 - name: Set password expiration for users with no expiration set
   win_command: |
     wmic useraccount where "Name='{{ item }}' and PasswordExpires=FALSE" set PasswordExpires=TRUE
   loop: "{{ active_users.stdout_lines | select('search', 'FALSE') | map('regex_replace', '\\s+.*$', '') | list }}"
   when: item != "Name"
+  register: password_expiration_changed
+
 
 - name: Ensure maximum password age is set to 90 days
   win_command: |
     net accounts /MAXPWAGE:90
 
+# 5. 조치 완료 메시지 출력 (실제로 변경이 발생한 경우에만)
+- name: Display password expiration set message
+  debug:
+    msg: "조치 완료: 암호 만료가 설정되지 않은 사용자들의 암호 만료 설정을 완료했습니다."
+  when: password_expiration_changed.changed

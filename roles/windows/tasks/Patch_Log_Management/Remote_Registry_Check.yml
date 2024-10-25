@@ -1,19 +1,28 @@
----
 - name: Check if Remote Registry Service is running
   ansible.windows.win_command: "net start"
   register: net_start_output
-
-- name: Display running services
-  debug:
-    var: net_start_output.stdout_lines
 
 - name: Check if Remote Registry Service is running
   set_fact:
     remote_registry_running: "{{ 'Remote Registry' in net_start_output.stdout }}"
 
-- name: Stop Remote Registry Service if it is running
-  ansible.windows.win_service:
-    name: RemoteRegistry
-    state: stopped
-  when: remote_registry_running
+- name: If Remote Registry Service is stopped
+  debug:
+    msg: "양호: Remote Registry Service가 중지되어 있습니다."
+  when: not remote_registry_running
 
+- name: If Remote Registry Service is running, log fail message and stop service
+  block:
+    - name: Log fail message
+      fail:
+        msg: "취약: Remote Registry Service가 사용 중입니다. 사용을 종료 합니다."
+
+    - name: Stop Remote Registry Service
+      ansible.windows.win_service:
+        name: RemoteRegistry
+        state: stopped
+
+    - name: Display action complete message
+      debug:
+        msg: "조치 완료: Remote Registry Service 사용이 중지되었습니다."
+  when: remote_registry_running

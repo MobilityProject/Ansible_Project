@@ -12,10 +12,11 @@
       - "Simple TCP/IP Services"
 
 - name: Check if unnecessary services are running
-  debug:
-    msg: "{{ item }} is running"
+  fail:
+    msg: "취약: 불필요한 서비스 {{ item }} 가 작동 중입니다.작동을 중지합니다."
   loop: "{{ unnecessary_services }}"
   when: item in running_services.stdout_lines
+  ignore_errors: yes
 
 - name: Stop unnecessary services if running
   ansible.windows.win_service:
@@ -24,10 +25,18 @@
     state: stopped
   loop: "{{ unnecessary_services }}"
   when: item in running_services.stdout_lines
+  register: service_stop_result
+
+- name: Display action Completed Message
+  debug:
+    msg: "조치 완료: 불필요한 서비스들이 비활성화되었습니다."
+  when: service_stop_result is changed
+
 
 - name: Display message for services that are already disabled or stopped
   debug:
-    msg: "{{ item }} is not running or already disabled"
+    msg: "양호: {{ item }} 서비스가 이미 비활성화되어 있습니다."
   loop: "{{ unnecessary_services }}"
   when: item not in running_services.stdout_lines
+
 

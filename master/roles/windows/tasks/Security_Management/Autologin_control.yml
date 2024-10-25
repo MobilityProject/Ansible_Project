@@ -1,0 +1,56 @@
+---
+# 1. PowerShell을 사용하여 AutoAdminLogon 레지스트리 값을 확인
+- name: Check if AutoAdminLogon exists and its value using PowerShell
+  win_shell: |
+    $key = "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon"
+    if (Test-Path $key) {
+        $value = Get-ItemProperty -Path $key -Name AutoAdminLogon -ErrorAction SilentlyContinue
+        if ($null -ne $value) {
+            Write-Host "AutoAdminLogon value is: $($value.AutoAdminLogon)"
+        } else {
+            Write-Host "AutoAdminLogon does not exist."
+        }
+    } else {
+        Write-Host "Registry path does not exist."
+    }
+  register: auto_admin_logon_output
+
+# 2. 레지스트리 값 디버그 출력
+- name: Debug output for AutoAdminLogon
+  debug:
+    msg: "{{ auto_admin_logon_output.stdout }}"
+
+# 3. PowerShell을 사용하여 AutoAdminLogon 값이 1이면 0으로 변경
+- name: Set AutoAdminLogon to 0 if it is currently set to 1
+  win_shell: |
+    $key = "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon"
+    $value = Get-ItemProperty -Path $key -Name AutoAdminLogon -ErrorAction SilentlyContinue
+    if ($null -ne $value -and $value.AutoAdminLogon -eq "1") {
+        Set-ItemProperty -Path $key -Name AutoAdminLogon -Value "0"
+        Write-Host "AutoAdminLogon was set to 1, now changed to 0."
+    } else {
+        Write-Host "No change needed."
+    }
+  when: "'AutoAdminLogon value is: 1' in auto_admin_logon_output.stdout"
+
+# 4. PowerShell을 사용하여 AutoAdminLogon 레지스트리 값을 확인
+- name: Check if AutoAdminLogon exists and its value using PowerShell
+  win_shell: |
+    $key = "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon"
+    if (Test-Path $key) {
+        $value = Get-ItemProperty -Path $key -Name AutoAdminLogon -ErrorAction SilentlyContinue
+        if ($null -ne $value) {
+            Write-Host "AutoAdminLogon value is: $($value.AutoAdminLogon)"
+        } else {
+            Write-Host "AutoAdminLogon does not exist."
+        }
+    } else {
+        Write-Host "Registry path does not exist."
+    }
+  register: auto_admin_logon_outputs
+
+# 5. 레지스트리 값 디버그 출력
+- name: Debug output for AutoAdminLogon
+  debug:
+    msg: "{{ auto_admin_logon_outputs.stdout }}"
+

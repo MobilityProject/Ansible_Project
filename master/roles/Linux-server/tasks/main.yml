@@ -7,19 +7,13 @@
 - name: Service check
   debug:
     msg: "OS가 Redhat이 아니므로 검사를 건너뜁니다."
-  when: ansible_os_family != "RedHat" and ansible_os_family != "Rocky"
+  when: ansible_os_family != "RedHat"
 
 - name: 서비스 정보 수집 (Linux)
   service_facts:
-  when: ansible_os_family == "RedHat" or ansible_os_family == "Rocky"
+  when: ansible_os_family == "RedHat"
 
 - block:
-  
-  - name: Include FileList
-    include_vars: ../vars/file_check_list.yml
-  - name: Include Vunerability Services List
-    include_vars: ../vars/vulnerablity_rtype_services.yml
-
   - name: Remote access restrictions
     import_tasks: ./Account_Managment/server_account.yml
   
@@ -59,5 +53,5 @@
   - name: Inspect Sendmail Vulnerability
     import_tasks: ./System_Management/Sendmail.yml
   
-  when: ansible_os_family == "RedHat" or ansible_os_family == "Rocky"
+  when: ansible_os_family == "RedHat"
 

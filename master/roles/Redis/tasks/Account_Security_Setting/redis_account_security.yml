@@ -33,28 +33,29 @@
 
   
   # deny_list에 IP가 존재할 경우 실패
-  - name: deny_list 내 IP가 존재할 경우 실패
-    fail:
-      msg: "취약: 'bind' 설정에 deny_list 내 IP가 포함되어 있습니다. /etc/redis/redis.conf를 확인하세요."
-    when: 
-      - bind_ip_check.stdout is search(deny_list | join('|'))
+#  - name: deny_list 내 IP가 존재할 경우 실패
+#    fail:
+#      msg: "취약: 'bind' 설정에 deny_list 내 IP가 포함되어 있습니다. /etc/redis/redis.conf를 확인하세요."
+#    when: 
+#      - bind_ip_check.stdout is search(deny_list | join('|'))
+#
+#  # 127.0.0.1만 존재할 경우 allow_list 추가
+#  - name: 127.0.0.1만 존재할 경우 allow_list 추가
+#    lineinfile:
+#      path: /etc/redis/redis.conf
+#      regexp: '^bind\s+127\.0\.0\.1\s*$'
+#       line: "bind 127.0.0.1 {{ allow_list | join(' ') }}"
+#      insertafter: '^#.*bind'
+#    when: 
+#      - bind_ip_check.stdout is search('^bind\s+127\.0\.0\.1\s*$')
 
-  # 127.0.0.1만 존재할 경우 allow_list 추가
-  - name: 127.0.0.1만 존재할 경우 allow_list 추가
-    lineinfile:
-      path: /etc/redis/redis.conf
-      regexp: '^bind\s+127\.0\.0\.1\s*$'
-      line: "bind 127.0.0.1 {{ allow_list | join(' ') }}"
-      insertafter: '^#.*bind'
-    when: 
-      - bind_ip_check.stdout is search('^bind\s+127\.0\.0\.1\s*$')
+#  # 127.0.0.1과 allow_list의 IP가 존재할 경우 성공 메시지 출력
+#  - name: 127.0.0.1과 allow_list 내 IP가 존재할 경우 성공
+#    debug:
+#      msg: "양호 : 'bind' 설정이 올바르게 되어 있습니다."
+#    when: 
+#      - bind_ip_check.stdout is search('^bind\s+(127\.0\.0\.1|(' + allow_list | join('|') + '))')
 
-  # 127.0.0.1과 allow_list의 IP가 존재할 경우 성공 메시지 출력
-  - name: 127.0.0.1과 allow_list 내 IP가 존재할 경우 성공
-    debug:
-      msg: "양호 : 'bind' 설정이 올바르게 되어 있습니다."
-    when: 
-      - bind_ip_check.stdout is search('^bind\s+(127\.0\.0\.1|(' + allow_list | join('|') + '))')
 
 
 
@@ -69,9 +70,9 @@
     set_fact:
       replica_read_only_msg: >
         {% if replica_read_only_check.rc == 0 %}
-        '양호: replica-read-only'가 /etc/redis/redis.conf에서 'yes'로 설정되어 있습니다.
+        'replica-read-only'가 /etc/redis/redis.conf에서 'yes'로 설정되어 있습니다.
         {% else %}
-        '취약: replica-read-only'가 /etc/redis/redis.conf에서 'no'로 설정되어 있습니다. 이를 'yes'로 변경합니다.
+        'replica-read-only'가 /etc/redis/redis.conf에서 'no'로 설정되어 있습니다. 이를 'yes'로 변경합니다.
         {% endif %}
 
   - debug:
@@ -143,27 +144,13 @@
     register: redis_conf_permissions
 
   - name: 권한 처리
-    fail:
-      msg: "취약: /etc/redis/redis.conf의 권한이 600을 초과합니다. 권한을 600으로 변경하세요."
-    when: redis_conf_permissions.stdout.split()[0] != '-rw-------'
-    ignore_errors: yes
-
-  - name: 권한이 양호할 경우 메시지 출력
     debug:
-      msg: "양호: /etc/redis/redis.conf의 권한이 600입니다. 설정이 올바릅니다."
-    when: redis_conf_permissions.stdout.split()[0] == '-rw-------'
-
-
-
-#  - name: 권한 처리
-#    debug:
-#      msg: >
-#        {% if redis_conf_permissions.stdout.split()[0] == '-rw-------' %}
-#        양호: /etc/redis/redis.conf의 권한이 600입니다. 설정이 올바릅니다.
-#        {% else %}
-#        취약: /etc/redis/redis.conf의 권한이 600을 초과합니다. 권한을 600으로 변경합니다.
-#        {% endif %}
-
+      msg: >
+        {% if redis_conf_permissions.stdout.split()[0] == '-rw-------' %}
+        양호: /etc/redis/redis.conf의 권한이 600입니다. 설정이 올바릅니다.
+        {% else %}
+        취약: /etc/redis/redis.conf의 권한이 600을 초과합니다. 권한을 600으로 변경합니다.
+        {% endif %}
 
   - name: 권한을 600으로 변경
     file:

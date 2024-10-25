@@ -1,0 +1,39 @@
+- name: Check IIS version
+  win_shell: |
+    $iisVersion = (Get-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\InetStp").VersionString
+    if ($iisVersion) {
+        # 숫자 부분만 추출하여 float로 변환
+        $versionNumber = [float]$iisVersion.Split(' ')[1]
+        Write-Output $versionNumber
+       # if ($versionNumber -ge 7.0) {
+       #     Write-Output "$versionNumber"
+       # } else {
+       #     Write-Output "$versionNumber"
+       # }
+    } 
+    else {
+        Write-Output "IIS is not installed."
+    }
+  register: iis_version
+
+- name: Define virtual directories to check
+  set_fact:
+    virtual_directories:
+      - "C:\\inetpub\\iissamples"
+      - "C:\\winnt\\help\\iishelp"
+      - "C:\\Program Files\\Common Files\\System\\MSADC\\Sample"
+  when: iis_version.stdout | float < 7.0
+
+- name: Check and remove virtual directories if they exist
+  win_shell: |
+    $dirPath = "{{dirPath}}"
+    if (Test-Path $dirPath) {
+        Remove-Item -Path $dirPath -Recurse -Force
+        Write-Output "Deleted: $dirPath"
+    } else {
+        Write-Output "Not found: $dirPath"
+    }
+  loop: "{{ virtual_directories }}"
+  loop_control:
+    loop_var: dirPath
+  when: iis_version.stdout | float < 7.0  

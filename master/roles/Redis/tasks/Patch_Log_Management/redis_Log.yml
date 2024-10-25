@@ -25,20 +25,3 @@
         {% endif %}
     when: true  # 항상 실행
 
-
-# 디버그 메시지 출력
-  - name: 취약
-    fail:
-      msg: "취약: 'slowlog-log-slower-than' 값이 100이 아니거나 'loglevel'이 notice로 설정되어 있지 않습니다."
-    when: 
-      - slowlog_value | int != 100
-      - loglevel_check.rc != 0
-    ignore_errors: yes
-
-  - name: 양호 시 메시지 출력
-    debug:
-      msg: "양호: 'slowlog-log-slower-than' 값이 100이고 'loglevel'이 notice로 설정되어 있습니다."
-    when: 
-      - slowlog_value | int == 100
-      - loglevel_check.rc == 0
-

@@ -1,0 +1,21 @@
+---
+- name: Get DisableWebDAV value from the registry using PowerShell
+  win_shell: |
+    $regPath = 'HKLM:\SYSTEM\CurrentControlSet\Services\W3SVC\Parameters'
+    $regName = 'DisableWebDAV'
+    $regValue = Get-ItemProperty -Path $regPath -Name $regName | Select-Object -ExpandProperty $regName
+    Write-Output $regValue
+  register: webdav_reg_value
+
+- name: Set DisableWebDAV to 1 if not already set using PowerShell
+  win_shell: |
+    $regPath = 'HKLM:\SYSTEM\CurrentControlSet\Services\W3SVC\Parameters'
+    $regName = 'DisableWebDAV'
+    $currentValue = "{{ webdav_reg_value.stdout }}"
+    if ($currentValue -ne 1) {
+        Set-ItemProperty -Path $regPath -Name $regName -Value 1
+        Write-Output "DisableWebDAV value set to 1"
+    } 
+  register: set_webdav_result
+
+

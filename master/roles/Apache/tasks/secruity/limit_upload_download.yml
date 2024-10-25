@@ -1,0 +1,25 @@
+---
+# LimitRequestBody 설정 확인 작업
+
+- name: File Check Apache Config
+  stat:
+    path: /etc/httpd/conf/httpd.conf
+  register: http_state
+  ignore_errors: yes
+
+- name: Check if LimitRequestBody is set in Apache configuration
+  shell: grep -i 'LimitRequestBody' /etc/httpd/conf/httpd.conf
+  register: limit_request_body_check
+  when: http_state.stat.exists
+  ignore_errors: yes
+
+- name: Fail if LimitRequestBody is not set
+  fail:
+    msg: "LimitRequestBody 설정이 없습니다. 파일 업로드 및 다운로드 용량을 제한>"
+  when: limit_request_body_check.rc != 0  # 설정이 없을 경우 실패
+  ignore_errors: yes
+
+- name: Display LimitRequestBody Check Result (Set)
+  debug:
+    msg: "/etc/httpd/conf/httpd.conf에 LimitRequestBody 설정이 발견되었습니다. >"
+  when: limit_request_body_check.rc == 0  # 설정이 있을 경우에만 출력

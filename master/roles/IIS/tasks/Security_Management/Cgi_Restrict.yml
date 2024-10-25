@@ -1,0 +1,31 @@
+---
+- name: Check and modify IIS applicationHost.config settings
+  win_shell: |
+    $configPath = "{{ application_host_config }}"
+    [xml]$config = Get-Content $configPath
+
+    $notListedIsapisAllowed = $config.configuration.'system.webserver'.security.isapiCgiRestriction.notListedIsapisAllowed
+    $notListedCgisAllowed = $config.configuration.'system.webserver'.security.isapiCgiRestriction.notListedCgisAllowed
+
+    $results = @()
+
+    if (-not $notListedIsapisAllowed -or $notListedIsapisAllowed -eq "false") {
+        $results += "양호: ISAPI 실행 제한되어있습니다. notListedIsapisAllowed is not set or is false."
+    } else {
+        $results += "취약: ISAPI 실행 제한이 되어있지 않습니다. notListedIsapisAllowed is set to true."
+    }
+
+    if (-not $notListedCgisAllowed -or $notListedCgisAllowed -eq "false") {
+        $results += "양호: CGI 실행 제한되어있습니다. notListedCgisAllowed is not set or is false."
+    } else {
+        $results += "취약: CGI 실행 제한이 되어있지 않습니다. notListedCgisAllowed is set to true."
+    }
+
+    # 결과 반환
+    $results -join "`n"
+  register: check_results
+
+- name: Print results
+  debug:
+    var: check_results.stdout_lines
+

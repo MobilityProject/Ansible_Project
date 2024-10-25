@@ -33,6 +33,24 @@
     import_tasks: ./Security_Management/Unused_File_Delete.yml
   when: ansible_os_family == 'Windows' and iis_service.state == 'running'
 
+### 조치 코드
+#- block:
+#  - name: Start for Cgi_Restrict.yml
+#    import_tasks: ./Security_Management/Cgi_Restrict_Sol.yml
+
+#  - name: Start for Webdav_off.yml
+#    import_tasks: ./Security_Management/Webdav_off_Sol.yml
+  
+#  - name: Start for High_Directory_Access.yml
+#    import_tasks: ./Access_Management/High_Directory_Access_Sol.yml
+
+#  - name: Start for Link_Deny.yml
+#    import_tasks: ./Security_Management/Link_Deny_Sol.yml
+  
+#  - name: Start for Unused_File_Delete.yml
+#    import_tasks: ./Security_Management/Unused_File_Delete_Sol.yml
+#  when: ansible_os_family == 'Windows' and iis_service.state == 'running'
+  
 - name: Skipping IIS Scan Logic
   debug:
     msg: "IIS Service가 발견되지 않아 검사 로직을 수행하지 않습니다."

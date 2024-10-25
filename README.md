@@ -1,4 +1,4 @@
-![image](https://github.com/user-attachments/assets/05c7adac-dad8-459f-862f-ebedddd0ddef)![image](https://github.com/user-attachments/assets/7a8778a4-63e2-4b4d-8600-1300b0bdac98)Ansible을 이용한 클라우드 취약점 분석 
+Ansible을 이용한 클라우드 취약점 분석 
 
 ![시스템 구성도 drawio](https://github.com/user-attachments/assets/b7512b0e-1e45-40f3-9dae-61f93f80934b)
 

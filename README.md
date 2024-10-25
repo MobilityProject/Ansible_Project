@@ -15,9 +15,9 @@ Ansible을 이용한 클라우드 취약점 분석
 </div>
   
 <div align=center> 
-
- <img src="https://img.shields.io/badge/diagram.net-orange?style=for-the-badge&logo=grafana&logoColor=white">
- <img src="https://img.shields.io/badge/docker-white?style=for-the-badge&logo=grafana&logoColor=black">
+ <img src="https://img.shields.io/badge/yaml-white?style=for-the-badge&logo=yaml&logoColor=black">
+ <img src="https://img.shields.io/badge/diagram.net-orange?style=for-the-badge&logo=diagram.net&logoColor=white">
+ <img src="https://img.shields.io/badge/docker-white?style=for-the-badge&logo=docker&logoColor=blue">
  <img src="https://img.shields.io/badge/rocky linux-orange?style=for-the-badge&logo=rockylinux&logoColor=red">
  <br>
  

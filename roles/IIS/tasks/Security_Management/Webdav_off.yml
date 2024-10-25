@@ -39,7 +39,7 @@
 - name: Output IIS service status
   debug:
     msg: |
-      {{'양호: webdav 설정이 적절합니다.' if (iis_service_status.stdout == 'Running' and webdav_reg_value.stdout | int == 1) 
+      {{'양호: webdav 설정이 적절합니다.' if (iis_service_status.stdout == 'not Running' and webdav_reg_value.stdout | int == 1) 
       else '취약: webdev 설정이 부적절합니다.'}}
       IIS Service is {{ iis_service_status.stdout }}
       Current DisableWebDAV value is {{ webdav_reg_value.stdout }}

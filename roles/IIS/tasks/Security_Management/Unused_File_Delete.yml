@@ -19,7 +19,7 @@
 - name: Stdout Version
   debug:
     msg: >
-      {{'양호: 가상디렉터리가 존재하지 않습니다.' if (iis_version.stdout | float >= 7.0)}}
+      {{'현재' if (iis_version.stdout | float >= 7.0)}}
       IIS Version : {{iis_version.stdout}}"
 
 - name: Define virtual directories to check
@@ -47,6 +47,6 @@
 - name: Check
   debug:
     msg: >
-      {{'양호: 가상디렉터리가 존재하지 않습니다.' if ('Exits' not indirectory_check_results) else 취약: 가상디렉터리가 존재합니다.}}
-      IIS Version : {{iis_version.stdout}}
-      {{directory_check_results}}
+      {{ '양호: 가상디렉터리가 존재하지 않습니다.' if 'Exits' not in directory_check_results else '취약: 가상디렉터리가 존재합니다.' }}
+      IIS Version : {{ iis_version.stdout }}
+

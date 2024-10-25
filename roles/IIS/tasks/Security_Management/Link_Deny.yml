@@ -14,14 +14,14 @@
 - name: Remove found shortcut files in wwwroot directory
   win_shell: |
     $LinkFiles = Get-ChildItem -Path "$env:SystemDrive\inetpub\wwwroot" -Recurse -Filter *.lnk
-    if ($LinkFiles) {
-        $LinkFiles | Remove-Item -Force
-        Write-Output "Deletion complete"
-    }
+    #if ($LinkFiles) { // 조치
+    #    $LinkFiles | Remove-Item -Force
+    #    Write-Output "Deletion complete"
+    #}
   when: "'No shortcut files found.' not in shell_output.stdout"
 
 - name: Confirm deletion in wwwroot directory
   debug:
-    msg: "{{'양호: 링크파일이 존재하지 않습니다.' if (No shortcut files found.' not in shell_output.stdout) else '취약: 링크파일이 존재합니다.' shell_output.stdout}}"
+    msg: "{{ '취약: 링크파일이 존재합니다.' if 'No shortcut files found.' not in shell_output.stdout else '양호: 링크파일이 존재하지 않습니다.' }}"
 
 

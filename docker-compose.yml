@@ -1,0 +1,96 @@
+version: '3' # 버전 Error 발생 시 3 또는 3.7로 변경
+
+services:
+
+  mysql:
+
+    ports:
+
+      - 3306:3306
+
+    image: mysql:5.6
+
+    container_name: mysql
+
+    hostname: mysql
+
+    environment:
+
+      MYSQL_RANDOM_ROOT_PASSWORD: 'yes'
+
+      MYSQL_DATABASE: semaphore_db
+
+      MYSQL_USER:  # mysql user id 사용자 지정
+
+      MYSQL_PASSWORD:  # mysql password 사용자 지정
+
+
+  semaphore:
+
+    ports:
+
+      - 3000:3000
+      - 22:22
+
+    image: ansiblesemaphore/semaphore:latest
+    volumes:
+      - ./playbook:/home/semaphore/playbook # 플레이북 backup용 repository를 사용해서 지정 가능
+      - ./ansible-config:/etc/ansible #  cfg 파일 지정 후 default로 사용가능
+    container_name: semaphore
+    environment:
+
+      SEMAPHORE_DB_USER: m4teamadmin # 세마포어 db 유저 ID
+
+      SEMAPHORE_DB_PASS: m4teamadmin_password # 세마포어 db 패스워드
+
+      SEMAPHORE_DB_HOST: mysql
+
+      SEMAPHORE_DB_PORT: 3306
+
+      SEMAPHORE_DB: semaphore_db
+
+      SEMAPHORE_PLAYBOOK_PATH: /tmp/semaphore  # default 위치 지정 Optional
+
+      SEMAPHORE_ADMIN_PASSWORD:  # 세마포어 어드민 패스워스 기본 패스워드 사용 금지
+
+      SEMAPHORE_ADMIN_NAME: # 세마포어 어드민 계정 아이디 기본 아이디 사용 금지 ex) admin
+
+      SEMAPHORE_ADMIN_EMAIL: # Optional Alert 기능 사용 시에 받을 이메일
+
+      SEMAPHORE_ADMIN: # admin name
+
+      SEMAPHORE_ACCESS_KEY_ENCRYPTION:  # access key
+
+    depends_on:
+
+      - mysql
+
+
+  loki:
+    image: grafana/loki:latest
+    container_name: loki
+    restart: unless-stopped
+    ports:
+      - 3100:3100  # Loki 기본 포트
+    command: -config.file=/etc/loki/local-config.yml # config file 사용 시 loki 데이터 지정 가능
+    volumes:
+      - ./loki:/etc/loki # 로키 config 파일 저장용 storage 변경
+      - loki-data:/home/loki
+
+      
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    restart: unless-stopped
+    ports:
+      - "3001:3000"  # Grafana의 기본포트가 세마포어와 겹치기 때문에 local의 3001번 포트와 포워딩
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=  # admin 계정 패스워드 default admin_password
+    volumes:
+      - grafana-data:/var/lib/grafana
+    depends_on:
+      - loki
+
+volumes:
+  loki-data:
+  grafana-data:

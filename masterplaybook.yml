@@ -7,16 +7,16 @@
   roles:
     # Include the role for Redis server management
     - role: Redis
-      when: "'redis' in group_names"
+    
     # Include the role for Linux server management
     - role: Linux-server
-      when: "'linux' in group_names"
+
     # Include the role for MySQL server management
     - role: MySQL
-      when: "'mysql' in group_names"
+
     # Include the role for Apache server management
     - role: Apache
-      when: "'Apache' in group_names"
+
     # Include the role for IIS server management
     - role: IIS
       when: "'win' in group_names"

@@ -92,7 +92,8 @@
       fail:
         msg: "취약: restrictqrun이 PrivacyOptions에 존재하지 않습니다."
       when: "'restrictqrun' not in privacy_options_output.stdout"
-    
+      ignore_errors: yes    
+
     - name: restrictqrun 확인 _2
       debug:
         msg: "양호: restrictqrun이 PrivacyOptions에 존재합니다."

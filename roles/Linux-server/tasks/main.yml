@@ -9,10 +9,6 @@
     msg: "OS가 Redhat이 아니므로 검사를 건너뜁니다."
   when: ansible_os_family != "RedHat" and ansible_os_family != "Rocky"
 
-- name: 서비스 정보 수집 (Linux)
-  service_facts:
-  when: ansible_os_family == "RedHat" or ansible_os_family == "Rocky"
-
 - block:
   
   - name: Include FileList

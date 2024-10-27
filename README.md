@@ -39,3 +39,8 @@ Ansible을 이용한 클라우드 취약점 분석
  <img src="https://img.shields.io/badge/github-181717?style=for-the-badge&logo=github&logoColor=white">
  <img src="https://img.shields.io/badge/git-F05032?style=for-the-badge&logo=git&logoColor=white">
 </div>
+
+
+기술 보고서
+[4조 모빌리티 기술문서 1 1.docx](https://github.com/user-attachments/files/17533404/4.1.1.docx)
+

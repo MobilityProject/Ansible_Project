@@ -64,33 +64,29 @@
 
 
   # Slave 읽기 전용 모드 설정
-  - name: replica-read-only가 yes로 설정되어 있는지 확인
-    command: grep -i '^\s*#\s*replica-read-only|^\s*replica-read-only\s+yes\s*$' /etc/redis/redis.conf
-    register: replica_read_only_check
-    ignore_errors: yes
-    changed_when: false
-
-  - name: replica-read-only 상태 확인 및 설정
-    set_fact:
-      replica_read_only_msg: >
-        {% if replica_read_only_check.rc == 0 %}
-        '양호: replica-read-only'가 /etc/redis/redis.conf에서 'yes'로 설정되어 있습니다.
-        {% else %}
-        '취약: replica-read-only'가 /etc/redis/redis.conf에서 'no'로 설정되어 있습니다. 이를 'yes'로 변경합니다.
-        {% endif %}
-
-  - debug:
-      msg: "{{ replica_read_only_msg }}"
-    when: true  # 항상 실행
-
-  - name: replica-read-only 앞에 주석이 있는 경우 yes로 변경
-    lineinfile:
-      path: /etc/redis/redis.conf
-      regexp: '^\s*#\s*replica-read-only'
-      line: 'replica-read-only yes'
-    when: replica_read_only_check.rc != 0  # no인 경우
-
-
+   - name: replica-read-only가 yes로 설정되어 있는지 확인
+      command: grep -i '^\s*replica-read-only\s+yes\s*$' /etc/redis/redis.conf
+      register: replica_read_only_check
+      ignore_errors: yes
+      changed_when: false
+  
+    - name: replica-read-only 상태 확인
+      fail:
+        msg: "취약: replica-read-only가 /etc/redis/redis.conf에서 설정되어 있지 않거나 주석 처리되어 있습니다."
+      when: replica_read_only_check.rc != 0
+      ignore_errors: yes
+  
+    - name: replica-read-only가 양호한 경우 메시지 출력
+      debug:
+        msg: "양호: replica-read-only가 /etc/redis/redis.conf에서 'yes'로 설정되어 있습니다."
+      when: replica_read_only_check.rc == 0
+  
+    - name: replica-read-only를 yes로 설정
+      lineinfile:
+        path: /etc/redis/redis.conf
+        regexp: '^\s*#?\s*replica-read-only'
+        line: 'replica-read-only yes'
+      when: replica_read_only_check.rc != 0
 
 
 
